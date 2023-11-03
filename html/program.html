@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tela Inicial | Kitchen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+    <link rel="icon" type="image/png"
+        href="https://png.pngtree.com/png-clipart/20220903/ourmid/pngtree-chef-restaurant-logo-png-image_6136204.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+
+<body>
+
+
+    <!--##################################################
+        menu do site
+    #####################################################-->
+    <nav class="navbar bg-dark navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" onclick="toggleSection('index')">
+                <img src="https://png.pngtree.com/png-clipart/20220903/ourmid/pngtree-chef-restaurant-logo-png-image_6136204.png"
+                    alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                Kitchen Restaurant
+            </a>
+            <button class="navbar-toggler" type="button" date-bs-toggle="collapse" date-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown" style="justify-content: end;">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" onclick="toggleSection('index')">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="toggleSection('history')">Histórico</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Pedidos
+                        </a>
+                        <ul class="dropdown-menu bg-dark">
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="toggleSection('updatePedidos')">Atualizar</a></li>
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="openModal('pedidos')">Cadastrar</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Pratos
+                        </a>
+                        <ul class="dropdown-menu bg-dark">
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="toggleSection('updateProduct')">Atualizar</a></li>
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="openModal('plates')">Cadastrar</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Clientes
+                        </a>
+                        <ul class="dropdown-menu bg-dark">
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="toggleSection('updateClient')">Atualizar</a></li>
+                            <li><a class="dropdown-item" style="color: white;"
+                                    onclick="toggleSection('updateClient')">Cadastrar</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="openModal('pedidos')">Fazer
+                            Pedido</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <script>
+            function openModal(modal) {
+                var modal = document.getElementById(modal);
+                modal.style.display = 'block';
+            }
+
+            function closeModal(modal) {
+                var modal = document.getElementById(modal);
+                modal.style.display = 'none';
+            }
+
+            function toggleSection(sectionId) {
+                const sections = document.querySelectorAll("main > section");
+                sections.forEach((section) => {
+                    section.style.display = "none";
+                });
+
+                const selectedSection = document.getElementById(sectionId);
+                if (selectedSection) {
+                    selectedSection.style.display = "flex";
+                }
+            }
+
+            toggleSection('chats')
+        </script>
+    </nav>
+    <!--##################################################
+        menu do site
+    #####################################################-->
+
+
+
+
+
+
+    <!--##################################################
+        telas de navegação do site
+    #####################################################-->
+    <main class="sections">
+        <section id="home" class="sections">
+        </section>
+        <section id="history" class="sections">
+        </section>
+        <section id="updatePedidos" class="sections">
+        </section>
+        <section id="updateProduct" class="sections">
+        </section>
+        <section id="updateClient" class="sections">
+        </section>
+    </main>
+    <!--##################################################
+        telas de navegação do site 
+    #####################################################-->
+
+
+
+
+
+
+    <!--##################################################
+        Modal de cadastro de pedidos
+    #####################################################-->
+    <div class="modal" id="pedidos" style="padding: 3%;">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <button class="btn btn-outline-secondary" onclick="closeModal('pedidos')">
+                    <i class="fas fa-times"></i>
+                </button>
+                Preencha as informações para fazer o pedido
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="product">Produto:</label>
+                    <select class="form-control" id="product" name="product">
+                        <option value="product1">Produto 1</option>
+                        <option value="product2">Produto 2</option>
+                        <option value="product3">Produto 3</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantidade">Quantidade:</label>
+                    <input type="number" class="form-control" id="quantidade" name="quantidade" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <textarea class="form-control" id="observacoes" name="observacoes" rows="4"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="submitJsonrequests()">Enviar Pedido</button>
+            </div>
+            <script>
+                function submitJsonrequests() {
+
+                    // Obter os valores dos campos do formulário
+                    const product = document.getElementById('product').value;
+                    const quantidade = document.getElementById('quantidade').value;
+                    const observacoes = document.getElementById('observacoes').value;
+
+                    // Montar um objeto JSON com os valores
+                    const jsonData = {
+                        type: "requests",
+                        product: product,
+                        quantidade: quantidade,
+                        observacoes: observacoes
+                    };
+
+                    // Enviar o objeto JSON em uma solicitação POST
+                    fetch("./", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                        });
+
+                    window.location.reload();
+                }
+            </script>
+        </div>
+    </div>
+    <!--##################################################
+        Modal de cadastro de pedidos
+    #####################################################-->
+
+
+
+    <!--##################################################
+        Modal de cadastro de clientes
+    #####################################################-->
+    <div class="modal" id="cliet" style="padding: 3%;">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <button class="btn btn-outline-secondary" onclick="closeModal('pedidos')">
+                    <i class="fas fa-times"></i>
+                </button>
+                Preencha as informações para cadastrar o cliente
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="name_cliente">Nome do Cliente:</label>
+                    <input type="text" class="form-control" id="name_cliente" name="name_cliente" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_cliente">Email do Cliente:</label>
+                    <input type="email" class="form-control" id="email_cliente" name="email_cliente" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="number_client">Numero do Cliente:</label>
+                    <input type="number" class="form-control" id="number_client" name="number_client" required>
+                </div>
+
+                <button class="btn btn-primary" onclick="submitJsonClient()">Enviar Pedido</button>
+            </div>
+            <script>
+                function submitJsonrequests() {
+
+                    // Obter os valores dos campos do formulário
+                    const nameCliente = document.getElementById('name_client').value;
+                    const emailCliente = document.getElementById('email_client').value;
+                    const number_client = document.getElementById('number_client').value;
+
+                    // Montar um objeto JSON com os valores
+                    const jsonData = {
+                        type: "clients",
+                        name_cliente: nameCliente,
+                        email_cliente: emailCliente,
+                        product: number_client
+                    };
+
+                    // Enviar o objeto JSON em uma solicitação POST
+                    fetch("./", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                        });
+
+                    window.location.reload();
+                }
+            </script>
+        </div>
+    </div>
+    <!--##################################################
+        Modal de cadastro de clientes
+    #####################################################-->
+
+
+
+    <!--##################################################
+        Modal de cadastro de plates
+    #####################################################-->
+    <div class="modal" id="plates" style="padding: 3%;">
+        <div class="card bg-dark text-white">
+            <div class="card-header">
+                <button class="btn btn-outline-secondary" onclick="closeModal('plates')">
+                    <i class="fas fa-times"></i>
+                </button>
+                Preencha as informações para cadastrar um plate
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="name_plate">Nome do Prato:</label>
+                    <input type="text" class="form-control" id="name_plate" name="name_plate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="picture_plate">Link da Foto do Prato:</label>
+                    <input type="text" class="form-control" id="picture_plate" name="picture_plate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="desciption_plate">Descrição do Prato:</label>
+                    <textarea class="form-control" id="desciption_plate" name="desciption_plate" rows="4"
+                        required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="price_plate">Preço do Prato (R$):</label>
+                    <input type="number" class="form-control" id="price_plate" name="price_plate" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="time_ready">Tempo Médio de Preparo (minutos):</label>
+                    <input type="number" class="form-control" id="time_ready" name="time_ready" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity_free">Quantidade Disponível:</label>
+                    <input type="number" class="form-control" id="quantity_free" name="quantity_free" required>
+                </div>
+
+                <button class="btn btn-primary" onclick="submitJsonplate()">Cadastrar plate</button>
+
+                <div class="form-group mt-3">
+                    <label for="imagem_preview">Preview da Imagem:</label>
+                    <img src="" id="imagem_preview" class="img-thumbnail" style="max-width: 100px; max-height: 100px">
+                </div>
+            </div>
+            <script>
+                function submitJsonplate() {
+
+                    // Obter os valores dos campos do formulário
+                    const nameplate = document.getElementById('name_plate').value;
+                    const fotoplate = document.getElementById('picture_plate').value;
+                    const descricaoplate = document.getElementById('desciption_plate').value;
+                    const precoplate = parseFloat(document.getElementById('price_plate').value);
+                    const tempoPreparo = parseInt(document.getElementById('time_ready').value);
+                    const quantidadeDisponivel = parseInt(document.getElementById('quantity_free').value);
+
+                    // Montar um objeto JSON com os valores
+                    const jsonData = {
+                        type: "plates",
+                        name_plate: nameplate,
+                        picture_plate: fotoplate,
+                        desciption_plate: descricaoplate,
+                        price_plate: precoplate,
+                        time_ready: tempoPreparo,
+                        quantity_free: quantidadeDisponivel
+                    };
+
+                    fetch("./", {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                        });
+
+                    window.location.reload();
+                }
+
+                // Função para atualizar a imagem de visualização
+                document.getElementById('picture_plate').addEventListener('input', function () {
+                    const imagemPreview = document.getElementById('imagem_preview');
+                    const fotoplate = this.value;
+
+                    // Atualize a imagem de visualização com o link informado
+                    imagemPreview.src = fotoplate;
+                });
+            </script>
+        </div>
+    </div>
+    <!--##################################################
+        Modal de cadastro de plates
+    #####################################################-->
+
+
+
+
+    <!--##################################################
+        Seção Javascript do site
+    #####################################################-->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+    <script>
+        var listOfRequestes = [];
+        function preparateJsonList(dateList) {
+            if (dateList) {
+                var dateJSON = dateList;
+                if (dateList.indexOf("},{") !== -1) {
+                    dateJSON = dateList.split("},{");
+                    dateJSON = dateJSON.map(function (item, index) {
+                        if (index === 0) {
+                            return item + "}";
+                        } else if (index === dateJSON.length - 1) {
+                            return "{" + item;
+                        } else {
+                            return "{" + item + "}";
+                        }
+                    });
+                    var dateList = dateJSON.map(function (item) {
+                        console.log(item)
+                        return JSON.parse(item);
+                    });
+                } else {
+                    if (!Array.isArray(dateList)) {
+                        dateJSON = [JSON.parse(dateList)];
+                    }
+
+                    return dateJSON;
+                }
+            }
+
+            return dateList
+        }
+
+        function renderRequests(dateList) {
+            if (dateList) {
+                document.getElementById("history").innerHTML = renderTable(dateList);
+                document.getElementById("updatePedidos").innerHTML = renderTable(dateList, true);
+            }
+        }
+
+        function renderPlates(dateList) {
+            if (dateList) {
+                document.getElementById("updateProduct").innerHTML = renderTable(dateList, true);
+            }
+        }
+
+        function renderUsers(dateList) {
+            if (dateList) {
+                document.getElementById("updateClient").innerHTML = renderTable(dateList, true);
+            }
+        }
+
+
+        function renderTable(dateList, edit) {
+            dateList = preparateJsonList(dateList);
+            var table = '<table class="table table-striped">';
+
+            // Cabeçalho da tabela
+            table += '<thead><tr>';
+            for (var key in dateList[0]) {
+                table += '<th>' + key + '</th>';
+            }
+            // Adicione uma coluna extra para o botão de edição
+            if (edit) {
+                table += '<th>Editar</th>';
+            }
+            table += '</tr></thead>';
+
+            // Corpo da tabela
+            table += '<tbody>';
+            for (var i = 0; i < dateList.length; i++) {
+                table += '<tr>';
+                for (var key in dateList[i]) {
+                    table += '<td>' + dateList[i][key] + '</td>';
+                }
+                // Adicione o botão de edição com um atributo date-index
+                if (edit) {
+                    table += '<td><button class="btn btn-outline-secondary" onclick="editItem(' + i + ')">Editar</button></td>';
+                    table += '</tr>';
+                }
+            }
+            table += '</tbody>';
+
+            table += '</table>';
+            return table;
+        }
+
+        function editItem(index) {
+            var item = listOfRequestes[index];
+            console.log(item);
+            document.getElementById('name_cliente').value = item.name;
+            document.getElementById('email_cliente').value = item.email;
+            document.getElementById('product').value = item.product;
+            document.getElementById('quantidade').value = item.quantity;
+            document.getElementById('observacoes').value = item.observations;
+            openModal('pedidos');
+        }
+
+
+        toggleSection('home')
+    </script>
+    <!--##################################################
+        Seção Javascript do site
+    #####################################################-->
+</body>
+
+</html>
