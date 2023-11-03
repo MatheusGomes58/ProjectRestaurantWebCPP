@@ -20,7 +20,7 @@
     #####################################################-->
     <nav class="navbar bg-dark navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" onclick="toggleSection('index')">
+            <a class="navbar-brand" onclick="toggleSection('menu')">
                 <img src="https://png.pngtree.com/png-clipart/20220903/ourmid/pngtree-chef-restaurant-logo-png-image_6136204.png"
                     alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
                 Kitchen Restaurant
@@ -32,7 +32,7 @@
             <div class="collapse navbar-collapse" id="navbarNavDropdown" style="justify-content: end;">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" onclick="toggleSection('index')">Menu</a>
+                        <a class="nav-link" aria-current="page" onclick="toggleSection('menu')">Menu</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" onclick="toggleSection('history')">Histórico</a>
@@ -103,7 +103,7 @@
                 }
             }
 
-            toggleSection('chats')
+            toggleSection('menu')
         </script>
     </nav>
     <!--##################################################
@@ -119,7 +119,7 @@
         telas de navegação do site
     #####################################################-->
     <main class="sections">
-        <section id="home" class="sections">
+        <section id="menu" class="sections">
         </section>
         <section id="history" class="sections">
         </section>
@@ -241,7 +241,7 @@
                 <button class="btn btn-primary" onclick="submitJsonClient()">Enviar Pedido</button>
             </div>
             <script>
-                function submitJsonrequests() {
+                function submitJsonClient() {
 
                     // Obter os valores dos campos do formulário
                     const nameCliente = document.getElementById('name_client').value;
@@ -386,12 +386,6 @@
     <!--##################################################
         Seção Javascript do site
     #####################################################-->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-        crossorigin="anonymous"></script>
     <script>
         var listOfRequestes = [];
         function preparateJsonList(dateList) {
@@ -425,23 +419,24 @@
         }
 
         function renderRequests(dateList) {
-            if (dateList) {
+            if (dateList && dateList.length > 0) {
                 document.getElementById("history").innerHTML = renderTable(dateList);
                 document.getElementById("updatePedidos").innerHTML = renderTable(dateList, true);
             }
         }
 
         function renderPlates(dateList) {
-            if (dateList) {
+            if (dateList && dateList.length > 0) {
                 document.getElementById("updateProduct").innerHTML = renderTable(dateList, true);
             }
         }
 
         function renderUsers(dateList) {
-            if (dateList) {
+            if (dateList && dateList.length > 0) {
                 document.getElementById("updateClient").innerHTML = renderTable(dateList, true);
             }
         }
+
 
 
         function renderTable(dateList, edit) {
@@ -488,10 +483,13 @@
             document.getElementById('observacoes').value = item.observations;
             openModal('pedidos');
         }
-
-
-        toggleSection('home')
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
     <!--##################################################
         Seção Javascript do site
     #####################################################-->

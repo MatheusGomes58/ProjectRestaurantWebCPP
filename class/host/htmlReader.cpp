@@ -26,9 +26,9 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         targetString = "HTTP/1.1 200 OK\r\n"
                        "Content-Type: text/html; charset=UTF-8\r\n\r\n";
         targetString.append(fileContents.begin(), fileContents.end());
-        targetString.append("\n<script>renderRequests('" + listofRequests + "');</script>");
-        targetString.append("\n<script>renderPlates('" + listofPlates + "');</script>");
-        targetString.append("\n<script>renderPlates('" + listofClients + "');</script>");
+        targetString.append("<script>renderRequests('" + listofRequests + "')</script>");
+        targetString.append("<script>renderPlates('" + listofPlates + "')</script>");
+        targetString.append("<script>renderPlates('" + listofClients + "')</script>");
     }
     else
     {

@@ -10,7 +10,7 @@ void createConnection(int& sock) {
 
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int));
 
-    int port = 3070;
+    int port = 3090;
     svr_addr.sin_family = AF_INET;
     svr_addr.sin_addr.s_addr = INADDR_ANY;
     svr_addr.sin_port = htons(port);
