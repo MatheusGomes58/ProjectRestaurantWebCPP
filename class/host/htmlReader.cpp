@@ -28,7 +28,7 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         targetString.append(fileContents.begin(), fileContents.end());
         targetString.append("<script>renderRequests('" + listofRequests + "')</script>");
         targetString.append("<script>renderPlates('" + listofPlates + "')</script>");
-        targetString.append("<script>renderPlates('" + listofClients + "')</script>");
+        targetString.append("<script>renderUsers('" + listofClients + "')</script>");
     }
     else
     {

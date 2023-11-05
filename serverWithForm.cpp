@@ -18,9 +18,10 @@ using json = nlohmann::json;
 void saveRequest(json jsonResponse)
 {
     request newRequest;
+    newRequest.client = jsonResponse["client"];
     newRequest.product = jsonResponse["product"];
-    newRequest.quantidade = jsonResponse["quantidade"];
-    newRequest.observacoes = jsonResponse["observacoes"];
+    newRequest.quantity = jsonResponse["quantity"];
+    newRequest.observations = jsonResponse["observations"];
 
     time_t now = time(0);
     tm *localTime = localtime(&now);
@@ -68,16 +69,15 @@ void processJson(json jsonResponse)
 
         if (type == "requests")
         {
-            std::cout << "inserindo pedido no Banco" << std::endl;
             saveRequest(jsonResponse);
         }
         else if (type == "plates")
         {
-            std::cout << "inserindo prato no Banco" << std::endl;
             savePlate(jsonResponse);
         }
         else if (type == "clients")
         {
+            saveClient(jsonResponse);
         }
         else
         {

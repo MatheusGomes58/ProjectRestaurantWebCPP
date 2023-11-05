@@ -2,13 +2,13 @@ struct client
 {
     std::string name_cliente;
     std::string email_cliente;
-    std::string number_client;
+    int number_client;
 };
 std::string listofClients;
 
 void addClient(const client &client)
 {
-    std::fstream datebaseOfClients("./class/datebase/files/clients.csv", std::ios::app | std::ios::in | std::ios::out);
+    std::fstream datebaseOfClients("./database/clients.csv", std::ios::app | std::ios::in | std::ios::out);
     if (datebaseOfClients.is_open())
     {
         datebaseOfClients << client.name_cliente << "," << client.email_cliente << "," << client.number_client << ";\n";
@@ -19,7 +19,7 @@ void addClient(const client &client)
 void listClients()
 {
     listofClients = "";
-    std::ifstream datebaseOfClients("./class/datebase/files/clients.csv");
+    std::fstream datebaseOfClients("./database/clients.csv");
 
     if (datebaseOfClients.is_open())
     {

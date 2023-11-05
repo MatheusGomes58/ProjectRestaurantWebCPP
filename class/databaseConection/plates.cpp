@@ -12,22 +12,19 @@ std::string listofPlates;
 
 void addPlate(const plate &plate)
 {
-    printf("entrou no addplate");
-    std::fstream datebaseOfPlates("./class/datebase/files/plates.csv", std::ios::app | std::ios::in | std::ios::out);
+    std::fstream datebaseOfPlates("./database/plates.csv", std::ios::app | std::ios::in | std::ios::out);
     if (datebaseOfPlates.is_open())
     {
-        printf("gerando arquivo");
         datebaseOfPlates << plate.desciption_plate << "," << plate.picture_plate << "," << plate.name_plate << ","
                 << plate.price_plate << "," << plate.quantity_free << "," << plate.time_ready << ";\n";
         datebaseOfPlates.close();
     }
-    printf("saiu do addplate");
 }
 
 void listPlates()
 {
     listofPlates = "";
-    std::ifstream datebaseOfPlates("./class/datebase/files/plates.csv");
+    std::fstream datebaseOfPlates("./database/plates.csv");
 
     if (datebaseOfPlates.is_open())
     {
@@ -45,8 +42,7 @@ void listPlates()
                 {
                     listofPlates += ",";
                 }
-                listofPlates += "{\"desciption_plate\":\"" + descricao + "\",\"picture_plate\":\"" + foto + "\",\"name_plate\":\"" +
-                                name + "\",\"price_plate\":" + preco + ",\"quantity_free\":" + quantidade +
+                listofPlates += "{\"name_plate\":\"" + name + "\",\"desciption_plate\":\"" + descricao + "\",\"picture_plate\":\"" + foto + "\",\"price_plate\":" + preco + ",\"quantity_free\":" + quantidade +
                                 ",\"time_ready\":" + tempo + "}";
             }
         }

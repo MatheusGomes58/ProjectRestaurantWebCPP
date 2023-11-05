@@ -70,7 +70,7 @@
                             <li><a class="dropdown-item" style="color: white;"
                                     onclick="toggleSection('updateClient')">Atualizar</a></li>
                             <li><a class="dropdown-item" style="color: white;"
-                                    onclick="openModal('client')">Cadastrar</a></li>
+                                    onclick="openModal('cliente')">Cadastrar</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -99,11 +99,9 @@
 
                 const selectedSection = document.getElementById(sectionId);
                 if (selectedSection) {
-                    selectedSection.style.display = "flex";
+                    selectedSection.style.display = "block";
                 }
             }
-
-            toggleSection('menu')
         </script>
     </nav>
     <!--##################################################
@@ -120,6 +118,10 @@
     #####################################################-->
     <main class="sections">
         <section id="menu" class="sections">
+            <div class="container">
+                <h1 class="text-center mt-5">Menu do Restaurante</h1>
+            </div>
+            <div class="row mt-4" id="menuList" style="justify-content: center;"></div>
         </section>
         <section id="history" class="sections">
         </section>
@@ -189,7 +191,9 @@
                     const client = document.getElementById('client').value;
                     const product = document.getElementById('product').value;
                     const quantidade = document.getElementById('quantidade').value;
-                    const observacoes = document.getElementById('observacoes').value;
+                    var observacoes = document.getElementById('observacoes').value;
+                    observacoes = observacoes.replace(/\n/g, '*');
+
 
                     // Montar um objeto JSON com os valores
                     const jsonData = {
@@ -226,7 +230,7 @@
     <!--##################################################
         Modal de cadastro de clientes
     #####################################################-->
-    <div class="modal" id="client" style="padding: 3%;">
+    <div class="modal" id="cliente" style="padding: 3%;">
         <div class="card bg-dark text-white">
             <div class="card-header">
                 <button class="btn btn-outline-secondary" onclick="closeModal('client')">
@@ -440,6 +444,7 @@
         function renderPlates(dateList) {
             if (dateList && dateList.length > 0) {
                 document.getElementById("updateProduct").innerHTML = renderTable(dateList, true);
+                renderMenuList(dateList);
             }
         }
 
@@ -485,6 +490,30 @@
             return table;
         }
 
+        function renderMenuList(dateList) {
+            document.getElementById("menuList").innerHTML = "";
+            dateList = preparateJsonList(dateList);
+            for (var i = 0; i < dateList.length; i++) {
+                var menuList = `
+                    <div class="col-md-3" style="margin:2%;">
+                        <div class="card">
+                            <img src="${dateList[i]["picture_plate"]}" class="card-img-top" alt="${dateList[i]["picture_plate"]}">
+                            <div class="card-body">
+                                <h5 class="card-title">${dateList[i]["name_plate"]}</h5>
+                                <p class="card-text">${dateList[i]["desciption_plate"]}</p>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">R$: ${dateList[i]["price_plate"]}</li>
+                                    <li class="list-group-item">Tempo: ${dateList[i]["time_ready"]}</li>
+                                    <li class="list-group-item">Quantidade disponivel: ${dateList[i]["quantity_free"]}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById("menuList").innerHTML += menuList;
+            }
+        }
+
         function editItem(index) {
             var item = listOfRequestes[index];
             console.log(item);
@@ -495,6 +524,7 @@
             document.getElementById('observacoes').value = item.observations;
             openModal('pedidos');
         }
+        toggleSection('menu')
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"

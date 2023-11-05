@@ -1,9 +1,9 @@
 /*****************************************************
  * Classes de configuração e conexão banco de dados
  *****************************************************/
-#include "./database/scripts/requests.cpp"
-#include "./database/scripts/plates.cpp"
-#include "./database/scripts/clients.cpp"
+#include "./databaseConection/requests.cpp"
+#include "./databaseConection/plates.cpp"
+#include "./databaseConection/clients.cpp"
 
 
 /*****************************************************
