@@ -25,7 +25,7 @@
                     alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
                 Kitchen Restaurant
             </a>
-            <button class="navbar-toggler" type="button" date-bs-toggle="collapse" date-bs-target="#navbarNavDropdown"
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -38,7 +38,7 @@
                         <a class="nav-link" onclick="toggleSection('history')">Histórico</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Pedidos
                         </a>
@@ -50,7 +50,7 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Pratos
                         </a>
@@ -62,7 +62,7 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" role="button" date-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Clientes
                         </a>
@@ -70,7 +70,7 @@
                             <li><a class="dropdown-item" style="color: white;"
                                     onclick="toggleSection('updateClient')">Atualizar</a></li>
                             <li><a class="dropdown-item" style="color: white;"
-                                    onclick="toggleSection('updateClient')">Cadastrar</a></li>
+                                    onclick="toggleSection('client')">Cadastrar</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -151,6 +151,16 @@
                 Preencha as informações para fazer o pedido
             </div>
             <div class="card-body">
+
+                <div class="form-group">
+                    <label for="client">Cliente:</label>
+                    <select class="form-control" id="client" name="client">
+                        <option value="client1">Cliente 1</option>
+                        <option value="client2">Cliente 2</option>
+                        <option value="client3">Cliente 3</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label for="product">Produto:</label>
                     <select class="form-control" id="product" name="product">
@@ -176,6 +186,7 @@
                 function submitJsonrequests() {
 
                     // Obter os valores dos campos do formulário
+                    const client = document.getElementById('client').value;
                     const product = document.getElementById('product').value;
                     const quantidade = document.getElementById('quantidade').value;
                     const observacoes = document.getElementById('observacoes').value;
@@ -183,9 +194,10 @@
                     // Montar um objeto JSON com os valores
                     const jsonData = {
                         type: "requests",
+                        client: client,
                         product: product,
-                        quantidade: quantidade,
-                        observacoes: observacoes
+                        quantity: quantidade,
+                        observations: observacoes
                     };
 
                     // Enviar o objeto JSON em uma solicitação POST
@@ -214,23 +226,23 @@
     <!--##################################################
         Modal de cadastro de clientes
     #####################################################-->
-    <div class="modal" id="cliet" style="padding: 3%;">
+    <div class="modal" id="client" style="padding: 3%;">
         <div class="card bg-dark text-white">
             <div class="card-header">
-                <button class="btn btn-outline-secondary" onclick="closeModal('pedidos')">
+                <button class="btn btn-outline-secondary" onclick="closeModal('client')">
                     <i class="fas fa-times"></i>
                 </button>
                 Preencha as informações para cadastrar o cliente
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <label for="name_cliente">Nome do Cliente:</label>
-                    <input type="text" class="form-control" id="name_cliente" name="name_cliente" required>
+                    <label for="name_client">Nome do Cliente:</label>
+                    <input type="text" class="form-control" id="name_client" name="name_cliente" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email_cliente">Email do Cliente:</label>
-                    <input type="email" class="form-control" id="email_cliente" name="email_cliente" required>
+                    <label for="email_client">Email do Cliente:</label>
+                    <input type="email" class="form-control" id="email_client" name="email_cliente" required>
                 </div>
 
                 <div class="form-group">
@@ -238,7 +250,7 @@
                     <input type="number" class="form-control" id="number_client" name="number_client" required>
                 </div>
 
-                <button class="btn btn-primary" onclick="submitJsonClient()">Enviar Pedido</button>
+                <button class="btn btn-primary" onclick="submitJsonClient()">Cadastrar Cliente</button>
             </div>
             <script>
                 function submitJsonClient() {
@@ -251,9 +263,9 @@
                     // Montar um objeto JSON com os valores
                     const jsonData = {
                         type: "clients",
-                        name_cliente: nameCliente,
-                        email_cliente: emailCliente,
-                        product: number_client
+                        name_client: nameCliente,
+                        email_client: emailCliente,
+                        number_client: number_client
                     };
 
                     // Enviar o objeto JSON em uma solicitação POST
@@ -322,7 +334,7 @@
                     <input type="number" class="form-control" id="quantity_free" name="quantity_free" required>
                 </div>
 
-                <button class="btn btn-primary" onclick="submitJsonplate()">Cadastrar plate</button>
+                <button class="btn btn-primary" onclick="submitJsonplate()">Cadastrar prato</button>
 
                 <div class="form-group mt-3">
                     <label for="imagem_preview">Preview da Imagem:</label>
