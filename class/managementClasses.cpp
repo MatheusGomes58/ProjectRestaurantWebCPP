@@ -4,6 +4,7 @@
 #include "./databaseConection/requests.cpp"
 #include "./databaseConection/plates.cpp"
 #include "./databaseConection/clients.cpp"
+#include "./databaseConection/history.cpp"
 
 
 /*****************************************************

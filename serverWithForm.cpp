@@ -11,52 +11,9 @@
 #include <ctime>
 
 #include "libraries/json.hpp"
-#include "./class/managementClasses.cpp"
-
 using json = nlohmann::json;
 
-void saveRequest(json jsonResponse)
-{
-    request newRequest;
-    newRequest.client = jsonResponse["client"];
-    newRequest.product = jsonResponse["product"];
-    newRequest.quantity = jsonResponse["quantity"];
-    newRequest.observations = jsonResponse["observations"];
-
-    time_t now = time(0);
-    tm *localTime = localtime(&now);
-    char dateBuffer[11];
-    strftime(dateBuffer, sizeof(dateBuffer), "%d/%m/%Y", localTime);
-    newRequest.date = dateBuffer;
-    char timeBuffer[9];
-    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
-    newRequest.hour = timeBuffer;
-
-    addRequest(newRequest);
-}
-
-void savePlate(json jsonResponse)
-{
-    plate newPlate;
-    newPlate.desciption_plate = jsonResponse["desciption_plate"];
-    newPlate.picture_plate = jsonResponse["picture_plate"];
-    newPlate.name_plate = jsonResponse["name_plate"];
-    newPlate.price_plate = jsonResponse["price_plate"];
-    newPlate.quantity_free = jsonResponse["quantity_free"];
-    newPlate.time_ready = jsonResponse["time_ready"];
-
-    addPlate(newPlate);
-}
-
-void saveClient(json jsonResponse)
-{
-    client newClient;
-    newClient.name_cliente = jsonResponse["name_client"];
-    newClient.email_cliente = jsonResponse["email_client"];
-    newClient.number_client = jsonResponse["number_client"];
-
-    addClient(newClient);
-}
+#include "./class/managementClasses.cpp"
 
 void processJson(json jsonResponse)
 {
@@ -66,18 +23,43 @@ void processJson(json jsonResponse)
     if (jsonResponse.contains("type"))
     {
         std::string type = jsonResponse["type"];
-
         if (type == "requests")
         {
             saveRequest(jsonResponse);
+            saveHistory(jsonResponse);
+        }
+        else if (type == "requestDelete")
+        {
+            deleteRequest(jsonResponse);
+        }
+        else if (type == "requestUpdate")
+        {
+            updateRequest(jsonResponse);
+            updateHistory(jsonResponse);
         }
         else if (type == "plates")
         {
             savePlate(jsonResponse);
         }
+        else if (type == "plateDelete")
+        {
+            deletePlate(jsonResponse);
+        }
+        else if (type == "plateUpdate")
+        {
+            updatePlate(jsonResponse);
+        }
         else if (type == "clients")
         {
             saveClient(jsonResponse);
+        }
+        else if (type == "clientDelete")
+        {
+            deleteClient(jsonResponse);
+        }
+        else if (type == "clientUpdate")
+        {
+            updateClient(jsonResponse);
         }
         else
         {
@@ -124,12 +106,6 @@ int main()
                 {
                 }
             }
-
-            // Se o JSON não for recebido ou "newPage" não for reconhecido, abra o arquivo "index" por padrão.
-            if (form_response.empty())
-            {
-            }
-
             loadHtmlFileIntoString("./html/program.html", form_response);
             write(client_fd, form_response.c_str(), form_response.size());
         }
