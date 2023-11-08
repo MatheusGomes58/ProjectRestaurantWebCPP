@@ -48,7 +48,7 @@ void listPlates()
                     listofPlates += ",";
                 }
                 listofPlates += "{\"name_plate\":\"" + name + "\",\"desciption_plate\":\"" + descricao + "\",\"picture_plate\":\"" + foto + "\",\"price_plate\":\"" + preco + "\",\"quantity_free\":\"" + quantidade +
-                                "\",\"time_ready\":\"" + tempo + "\",\"origin\":\"plate\"}";
+                                "\",\"time_ready\":\"" + tempo + "\",\"Origem\":\"plate\"}";
             }
         }
         databaseOfPlates.close();

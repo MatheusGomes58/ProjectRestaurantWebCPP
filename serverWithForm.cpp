@@ -1,18 +1,3 @@
-#include <iostream>
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <unordered_map>
-#include <fstream>
-#include <vector>
-#include <cstdio>
-#include <ctime>
-
-#include "libraries/json.hpp"
-using json = nlohmann::json;
-
 #include "./class/managementClasses.cpp"
 
 void processJson(json jsonResponse)

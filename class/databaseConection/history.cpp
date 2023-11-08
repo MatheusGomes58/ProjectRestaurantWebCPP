@@ -1,23 +1,44 @@
 struct history
 {
-    std::string client_history;
-    std::string product_history;
-    std::string quantity_history;
-    std::string observations_history;
-    std::string date_history;
-    std::string hour_history;
+    std::string Cliente;
+    std::vector<std::string> Produto;
+    std::vector<std::string> Quantidade;
+    std::string Observação;
+    std::string Data;
+    std::string Hora;
 };
-std::string listofHistory;
+
+std::string listofHistorys;
 
 void addHistory(const history &history)
 {
-    std::fstream databaseOfHistory("./database/history.csv", std::ios::app | std::ios::in | std::ios::out);
-    if (databaseOfHistory.is_open())
+    std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
+    if (databaseOfHistorys.is_open())
     {
-        databaseOfHistory << history.client_history << "," << history.product_history << ","
-                           << history.quantity_history << "," << history.observations_history << ","
-                           << history.date_history << "," << history.hour_history << "\n";
-        databaseOfHistory.close();
+        std::string Produto, Quantidade;
+
+        for (size_t i = 0; i < history.Produto.size(); i++)
+        {
+            if (Produto.size() > 1)
+            {
+                Produto += ";";
+            }
+            if (Quantidade.size() >= 1)
+            {
+                Quantidade += ";";
+            }
+            Produto += history.Produto[i];
+            Quantidade += history.Quantidade[i];
+        }
+
+        databaseOfHistorys << history.Cliente << ","
+                           << Produto << ","
+                           << Quantidade << ","
+                           << history.Observação << ","
+                           << history.Data << ","
+                           << history.Hora << "\n";
+
+        databaseOfHistorys.close();
     }
     else
     {
@@ -26,41 +47,56 @@ void addHistory(const history &history)
     return;
 }
 
-void listHistory()
+void listHistorys()
 {
-    std::fstream databaseOfHistory("./database/history.csv");
-    listofHistory = "";
-    if (databaseOfHistory.is_open())
+    std::fstream databaseOfHistorys("./database/historys.csv");
+    listofHistorys = "";
+
+    if (databaseOfHistorys.is_open())
     {
         std::string line;
-        while (std::getline(databaseOfHistory, line))
+        while (std::getline(databaseOfHistorys, line))
         {
             std::istringstream iss(line);
-            std::string client_history, product_history, quantity_history, observations_history, date_history, hour_history;
+            std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, client_history, ',') &&
-                std::getline(iss, product_history, ',') &&
-                std::getline(iss, quantity_history, ',') &&
-                std::getline(iss, observations_history, ',') &&
-                std::getline(iss, date_history, ',') &&
-                std::getline(iss, hour_history, ';'))
+            if (std::getline(iss, Cliente, ',') &&
+                std::getline(iss, Produto, ',') &&
+                std::getline(iss, Quantidade, ',') &&
+                std::getline(iss, Observação, ',') &&
+                std::getline(iss, Data, ',') &&
+                std::getline(iss, Hora, '\n'))
             {
-                if (!listofHistory.empty())
+                // Criar um objeto JSON para representar a solicitação
+                json historyJson;
+                historyJson["Cliente"] = Cliente;
+                historyJson["Data"] = Data;
+                historyJson["Hora"] = Hora;
+                std::vector<std::string> products = splitString(Produto, ';');
+                std::vector<std::string> quantities = splitString(Quantidade, ';');
+                historyJson["Produto"] = products;
+                historyJson["Quantidade"] = quantities;
+                historyJson["Observação"] = Observação;
+                historyJson["Origem"] = "history";
+
+                // Converter o objeto JSON em uma string e adicionar à lista
+                if (!listofHistorys.empty())
                 {
-                    listofHistory += ",";
+                    listofHistorys += ",";
                 }
-                listofHistory += "{\"date_history\":\"" + date_history + "\",\"hour_history\":\"" + hour_history + "\",\"client_history\":\"" + client_history + "\",\"product_history\":\"" + product_history + "\",\"quantity_history\":\"" + quantity_history + "\",\"observations_history\":\"" + observations_history + "\",\"origin\":\"history\"}";
+                listofHistorys += historyJson.dump();
             }
         }
-        databaseOfHistory.close();
+
+        databaseOfHistorys.close();
     }
     return;
 }
 
 void editHistory(const history &oldHistory, const history &newHistory)
 {
-    std::fstream databaseOfHistory("./database/history.csv", std::ios::app | std::ios::in | std::ios::out);
-    if (databaseOfHistory.is_open())
+    std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
+    if (databaseOfHistorys.is_open())
     {
         std::fstream temporario("./database/temp.csv", std::ios::out);
         if (!temporario)
@@ -71,46 +107,83 @@ void editHistory(const history &oldHistory, const history &newHistory)
 
         bool encontrado = false;
         std::string line;
-        while (std::getline(databaseOfHistory, line))
+        while (std::getline(databaseOfHistorys, line))
         {
             std::istringstream iss(line);
-            std::string client_history, product_history, quantity_history, observations_history, date_history, hour_history;
+            std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, client_history, ',') &&
-                std::getline(iss, product_history, ',') &&
-                std::getline(iss, quantity_history, ',') &&
-                std::getline(iss, observations_history, ',') &&
-                std::getline(iss, date_history, ',') &&
-                std::getline(iss, hour_history, ';'))
+            if (std::getline(iss, Cliente, ',') &&
+                std::getline(iss, Produto, ',') &&
+                std::getline(iss, Quantidade, ',') &&
+                std::getline(iss, Observação, ',') &&
+                std::getline(iss, Data, ',') &&
+                std::getline(iss, Hora, ';'))
             {
 
-                if (oldHistory.client_history == client_history &&
-                    oldHistory.date_history == date_history &&
-                    oldHistory.hour_history == hour_history &&
-                    oldHistory.observations_history == observations_history &&
-                    oldHistory.product_history == product_history &&
-                    oldHistory.quantity_history == quantity_history)
+                bool match = true;
+
+                if (oldHistory.Cliente == Cliente &&
+                    oldHistory.Data == Data &&
+                    oldHistory.Hora == Hora &&
+                    oldHistory.Observação == Observação)
+                {
+                    if (oldHistory.Produto.size() == Produto.size() &&
+                        oldHistory.Quantidade.size() == Quantidade.size())
+                    {
+                        for (size_t i = 0; i < oldHistory.Produto.size(); i++)
+                        {
+                            if (oldHistory.Produto[i] != Produto ||
+                                oldHistory.Quantidade[i] != Quantidade)
+                            {
+                                match = false;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        match = false;
+                    }
+                }
+                else
+                {
+                    match = false;
+                }
+
+                if (match)
                 {
                     // Se a entrada atual for a que queremos editar, substitua pelos novos valores
-                    temporario << newHistory.client_history << "," << newHistory.product_history << ","
-                               << newHistory.quantity_history << "," << newHistory.observations_history << ","
-                               << oldHistory.date_history << "," << oldHistory.hour_history << "\n";
+                    temporario << newHistory.Cliente << ",";
+                    for (size_t i = 0; i < newHistory.Produto.size(); i++)
+                    {
+                        temporario << newHistory.Produto[i] << ",";
+                        temporario << newHistory.Quantidade[i] << ",";
+                    }
+                    temporario << newHistory.Observação << ","
+                               << oldHistory.Data << ","
+                               << oldHistory.Hora << "\n";
                     encontrado = true;
                 }
                 else
                 {
-                    // Caso contrário, mantenha a entrada original
-                    temporario << client_history << "," << product_history << ","
-                               << quantity_history << "," << observations_history << ","
-                               << date_history << "," << hour_history << "\n";
+                    // Caso contrário, mantenha a entrada Origemal
+                    temporario << Cliente << ",";
+                    for (size_t i = 0; i < Produto.size(); i++)
+                    {
+                        temporario << Produto[i] << ",";
+                        temporario << Quantidade[i] << ",";
+                    }
+                    temporario << Observação << ","
+                               << Data << ","
+                               << Hora << "\n";
                 }
             }
         }
 
         temporario.close();
-        databaseOfHistory.close();
-        remove("./database/history.csv");
-        rename("./database/temp.csv", "./database/history.csv");
+        databaseOfHistorys.close();
+        remove("./database/historys.csv");
+        rename("./database/temp.csv", "./database/historys.csv");
 
         if (!encontrado)
         {
@@ -122,46 +195,46 @@ void editHistory(const history &oldHistory, const history &newHistory)
 history historyMap(json jsonResponse, std::string premissa)
 {
     history history;
-    if (jsonResponse.contains(premissa + "client_request"))
+    if (jsonResponse.contains(premissa + "Cliente"))
     {
-        history.client_history = jsonResponse[premissa + "client_request"];
+        history.Cliente = jsonResponse[premissa + "Cliente"];
     }
-    if (jsonResponse.contains(premissa + "observations_request"))
+    if (jsonResponse.contains(premissa + "Observação"))
     {
-        history.observations_history = jsonResponse[premissa + "observations_request"];
+        history.Observação = jsonResponse[premissa + "Observação"];
     }
-    if (jsonResponse.contains(premissa + "product_request"))
+    if (jsonResponse.contains(premissa + "Produto"))
     {
-        history.product_history = jsonResponse[premissa + "product_request"];
+        history.Produto = jsonResponse[premissa + "Produto"];
     }
-    if (jsonResponse.contains(premissa + "date_request"))
+    if (jsonResponse.contains(premissa + "Data"))
     {
-        history.date_history = jsonResponse[premissa + "date_request"];
+        history.Data = jsonResponse[premissa + "Data"];
     }
-    if (jsonResponse.contains(premissa + "hour_request"))
+    if (jsonResponse.contains(premissa + "Hora"))
     {
-        history.hour_history = jsonResponse[premissa + "hour_request"];
+        history.Hora = jsonResponse[premissa + "Hora"];
     }
-    if (jsonResponse.contains(premissa + "quantity_request"))
+    if (jsonResponse.contains(premissa + "Quantidade"))
     {
-        history.quantity_history = jsonResponse[premissa + "quantity_request"];
+        history.Quantidade = jsonResponse[premissa + "Quantidade"];
     }
     return history;
 }
 
 void saveHistory(json jsonResponse)
 {
-    history newHistory = historyMap(jsonResponse,"");
+    history newHistory = historyMap(jsonResponse, "");
 
     time_t now = time(0);
     tm *localTime = localtime(&now);
     char dataBuffer[11];
     strftime(dataBuffer, sizeof(dataBuffer), "%d/%m/%Y", localTime);
-    newHistory.date_history = dataBuffer;
+    newHistory.Data = dataBuffer;
 
     char timeBuffer[10];
     strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", localTime);
-    newHistory.hour_history = timeBuffer;
+    newHistory.Hora = timeBuffer;
 
     addHistory(newHistory);
     return;
@@ -171,6 +244,6 @@ void updateHistory(json jsonResponse)
 {
     history oldHistory = historyMap(jsonResponse, "old_");
     history UpdateHistory = historyMap(jsonResponse, "");
-    editHistory(oldHistory,UpdateHistory);
+    editHistory(oldHistory, UpdateHistory);
     return;
 }

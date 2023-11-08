@@ -35,7 +35,7 @@ void listClients() {
                 if (!listofClients.empty()) {
                     listofClients += ",";
                 }
-                listofClients += "{\"name_client\":\"" + name_client + "\",\"email_client\":\"" + email_client + "\",\"number_client\":\"" + number_client + "\",\"origin\":\"client\"}";
+                listofClients += "{\"name_client\":\"" + name_client + "\",\"email_client\":\"" + email_client + "\",\"number_client\":\"" + number_client + "\",\"Origem\":\"client\"}";
             }
         }
         databaseOfClients.close();
@@ -110,7 +110,7 @@ void editClient(const client &oldClient, const client &newClient) {
                                << newClient.number_client << "\n";
                     encontrado = true;
                 } else {
-                    // Caso contrário, mantenha o cliente original
+                    // Caso contrário, mantenha o cliente Origemal
                     temporario << name_client << "," << email_client << ","
                                << number_client << "\n";
                 }
