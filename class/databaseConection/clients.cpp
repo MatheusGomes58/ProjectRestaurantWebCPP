@@ -1,8 +1,8 @@
 struct client
 {
-    std::string name_client;
-    std::string email_client;
-    std::string number_client;
+    std::string Nome;
+    std::string Email;
+    std::string Numero;
 };
 std::string listofClients;
 
@@ -11,7 +11,7 @@ void addClient(const client &client)
     std::fstream databaseOfClients("./database/clients.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfClients.is_open())
     {
-        databaseOfClients << client.name_client << "," << client.email_client << "," << client.number_client << ";\n";
+        databaseOfClients << client.Nome << "|" << client.Email << "|" << client.Numero << "\n";
         databaseOfClients.close();
     }else{
         std::cout << "falha ao estabelecer conexão com banco de dados" << std::endl;
@@ -27,15 +27,15 @@ void listClients() {
         std::string line;
         while (std::getline(databaseOfClients, line)) {
             std::istringstream iss(line);
-            std::string name_client, email_client, number_client;
+            std::string Nome, Email, Numero;
 
-            if (std::getline(iss, name_client, ',') &&
-                std::getline(iss, email_client, ',') &&
-                std::getline(iss, number_client, ';')) {
+            if (std::getline(iss, Nome, '|') &&
+                std::getline(iss, Email, '|') &&
+                (std::getline(iss, Numero, '\n')||"")) {
                 if (!listofClients.empty()) {
                     listofClients += ",";
                 }
-                listofClients += "{\"name_client\":\"" + name_client + "\",\"email_client\":\"" + email_client + "\",\"number_client\":\"" + number_client + "\",\"Origem\":\"client\"}";
+                listofClients += "{\"Nome\":\"" + Nome + "\",\"Email\":\"" + Email + "\",\"Numero\":\"" + Numero + "\",\"Origem\":\"client\"}";
             }
         }
         databaseOfClients.close();
@@ -55,17 +55,17 @@ void dellClient(const client &client) {
         std::string line;
         while (std::getline(databaseOfClients, line)) {
             std::istringstream iss(line);
-            std::string name_client, email_client, number_client;
+            std::string Nome, Email, Numero;
 
-            if (std::getline(iss, name_client, ',') &&
-                std::getline(iss, email_client, ',') &&
-                std::getline(iss, number_client, ';')) {
+            if (std::getline(iss, Nome, '|') &&
+                std::getline(iss, Email, '|') &&
+                std::getline(iss, Numero, '\n')) {
 
-                if (!(client.name_client == name_client &&
-                      client.email_client == email_client &&
-                      client.number_client == number_client)) {
-                    temporario << name_client << "," << email_client << ","
-                               << number_client << "\n";
+                if (!(client.Nome == Nome &&
+                      client.Email == Email &&
+                      client.Numero == Numero)) {
+                    temporario << Nome << "|" << Email << "|"
+                               << Numero << "\n";
                 } else {
                     encontrado = true;
                 }
@@ -96,23 +96,23 @@ void editClient(const client &oldClient, const client &newClient) {
         std::string line;
         while (std::getline(databaseOfClients, line)) {
             std::istringstream iss(line);
-            std::string name_client, email_client, number_client;
+            std::string Nome, Email, Numero;
 
-            if (std::getline(iss, name_client, ',') &&
-                std::getline(iss, email_client, ',') &&
-                std::getline(iss, number_client, ';')) {
+            if (std::getline(iss, Nome, '|') &&
+                std::getline(iss, Email, '|') &&
+                std::getline(iss, Numero, '\n')) {
 
-                if (oldClient.name_client == name_client &&
-                    oldClient.email_client == email_client &&
-                    oldClient.number_client == number_client) {
+                if (oldClient.Nome == Nome &&
+                    oldClient.Email == Email &&
+                    oldClient.Numero == Numero) {
                     // Se o cliente atual for o que queremos editar, substitua pelos novos valores
-                    temporario << newClient.name_client << "," << newClient.email_client << ","
-                               << newClient.number_client << "\n";
+                    temporario << newClient.Nome << "|" << newClient.Email << "|"
+                               << newClient.Numero << "\n";
                     encontrado = true;
                 } else {
                     // Caso contrário, mantenha o cliente Origemal
-                    temporario << name_client << "," << email_client << ","
-                               << number_client << "\n";
+                    temporario << Nome << "|" << Email << "|"
+                               << Numero << "\n";
                 }
             }
         }
@@ -132,32 +132,32 @@ void editClient(const client &oldClient, const client &newClient) {
 
 void saveClient(json jsonResponse) {
     client newClient;
-    newClient.name_client = jsonResponse["name_client"];
-    newClient.email_client = jsonResponse["email_client"];
-    newClient.number_client = jsonResponse["number_client"];
+    newClient.Nome = jsonResponse["Nome"];
+    newClient.Email = jsonResponse["Email"];
+    newClient.Numero = jsonResponse["Numero"];
 
     addClient(newClient);
 }
 
 void deleteClient(json jsonResponse) {
     client deleteClient;
-    deleteClient.name_client = jsonResponse["name_client"];
-    deleteClient.email_client = jsonResponse["email_client"];
-    deleteClient.number_client = jsonResponse["number_client"];
+    deleteClient.Nome = jsonResponse["Nome"];
+    deleteClient.Email = jsonResponse["Email"];
+    deleteClient.Numero = jsonResponse["Numero"];
 
     dellClient(deleteClient);
 }
 
 void updateClient(json jsonResponse) {
     client oldClient;
-    oldClient.name_client = jsonResponse["old_name_client"];
-    oldClient.email_client = jsonResponse["old_email_client"];
-    oldClient.number_client = jsonResponse["old_number_client"];
+    oldClient.Nome = jsonResponse["old_Nome"];
+    oldClient.Email = jsonResponse["old_Email"];
+    oldClient.Numero = jsonResponse["old_Numero"];
 
     client newClient;
-    newClient.name_client = jsonResponse["name_client"];
-    newClient.email_client = jsonResponse["email_client"];
-    newClient.number_client = jsonResponse["number_client"];
+    newClient.Nome = jsonResponse["Nome"];
+    newClient.Email = jsonResponse["Email"];
+    newClient.Numero = jsonResponse["Numero"];
 
     editClient(oldClient, newClient);
 }

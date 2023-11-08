@@ -22,17 +22,17 @@ void processJson(json jsonResponse)
             updateRequest(jsonResponse);
             updateHistory(jsonResponse);
         }
-        else if (type == "plates")
+        else if (type == "products")
         {
-            savePlate(jsonResponse);
+            saveProduct(jsonResponse);
         }
-        else if (type == "plateDelete")
+        else if (type == "productDelete")
         {
-            deletePlate(jsonResponse);
+            deleteProduct(jsonResponse);
         }
-        else if (type == "plateUpdate")
+        else if (type == "productUpdate")
         {
-            updatePlate(jsonResponse);
+            updateProduct(jsonResponse);
         }
         else if (type == "clients")
         {

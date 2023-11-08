@@ -3,7 +3,7 @@ struct history
     std::string Cliente;
     std::vector<std::string> Produto;
     std::vector<std::string> Quantidade;
-    std::string Observação;
+    std::vector<std::string> Observação;
     std::string Data;
     std::string Hora;
 };
@@ -15,27 +15,16 @@ void addHistory(const history &history)
     std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfHistorys.is_open())
     {
-        std::string Produto, Quantidade;
+        std::string Produto, Quantidade, Observação;
+        Produto = createStringList(history.Produto);
+        Quantidade = createStringList(history.Quantidade);
+        Observação = createStringList(history.Observação);
 
-        for (size_t i = 0; i < history.Produto.size(); i++)
-        {
-            if (Produto.size() > 1)
-            {
-                Produto += ";";
-            }
-            if (Quantidade.size() >= 1)
-            {
-                Quantidade += ";";
-            }
-            Produto += history.Produto[i];
-            Quantidade += history.Quantidade[i];
-        }
-
-        databaseOfHistorys << history.Cliente << ","
-                           << Produto << ","
-                           << Quantidade << ","
-                           << history.Observação << ","
-                           << history.Data << ","
+        databaseOfHistorys << history.Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << history.Data << "|"
                            << history.Hora << "\n";
 
         databaseOfHistorys.close();
@@ -60,12 +49,12 @@ void listHistorys()
             std::istringstream iss(line);
             std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, Cliente, ',') &&
-                std::getline(iss, Produto, ',') &&
-                std::getline(iss, Quantidade, ',') &&
-                std::getline(iss, Observação, ',') &&
-                std::getline(iss, Data, ',') &&
-                std::getline(iss, Hora, '\n'))
+            if (std::getline(iss, Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, Data, '|') &&
+                (std::getline(iss, Hora, '\n')||""))
             {
                 // Criar um objeto JSON para representar a solicitação
                 json historyJson;
@@ -74,9 +63,10 @@ void listHistorys()
                 historyJson["Hora"] = Hora;
                 std::vector<std::string> products = splitString(Produto, ';');
                 std::vector<std::string> quantities = splitString(Quantidade, ';');
+                std::vector<std::string> observations = splitString(Observação, ';');
                 historyJson["Produto"] = products;
                 historyJson["Quantidade"] = quantities;
-                historyJson["Observação"] = Observação;
+                historyJson["Observação"] = observations;
                 historyJson["Origem"] = "history";
 
                 // Converter o objeto JSON em uma string e adicionar à lista
@@ -93,7 +83,7 @@ void listHistorys()
     return;
 }
 
-void editHistory(const history &oldHistory, const history &newHistory)
+void dellHistory(const history &history)
 {
     std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfHistorys.is_open())
@@ -105,6 +95,11 @@ void editHistory(const history &oldHistory, const history &newHistory)
             return;
         }
 
+        std::string listProduto, listQuantidade, listObservação;
+        listProduto = createStringList(history.Produto);
+        listQuantidade = createStringList(history.Quantidade);
+        listObservação = createStringList(history.Observação);
+
         bool encontrado = false;
         std::string line;
         while (std::getline(databaseOfHistorys, line))
@@ -112,70 +107,30 @@ void editHistory(const history &oldHistory, const history &newHistory)
             std::istringstream iss(line);
             std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, Cliente, ',') &&
-                std::getline(iss, Produto, ',') &&
-                std::getline(iss, Quantidade, ',') &&
-                std::getline(iss, Observação, ',') &&
-                std::getline(iss, Data, ',') &&
-                std::getline(iss, Hora, ';'))
+            if (std::getline(iss, Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, Data, '|') &&
+                std::getline(iss, Hora, '\n'))
             {
-
-                bool match = true;
-
-                if (oldHistory.Cliente == Cliente &&
-                    oldHistory.Data == Data &&
-                    oldHistory.Hora == Hora &&
-                    oldHistory.Observação == Observação)
+                if (!(history.Cliente == Cliente &&
+                      history.Data == Data &&
+                      history.Hora == Hora &&
+                      listObservação == Observação &&
+                      listProduto == Produto &&
+                      listQuantidade == Quantidade))
                 {
-                    if (oldHistory.Produto.size() == Produto.size() &&
-                        oldHistory.Quantidade.size() == Quantidade.size())
-                    {
-                        for (size_t i = 0; i < oldHistory.Produto.size(); i++)
-                        {
-                            if (oldHistory.Produto[i] != Produto ||
-                                oldHistory.Quantidade[i] != Quantidade)
-                            {
-                                match = false;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        match = false;
-                    }
-                }
-                else
-                {
-                    match = false;
-                }
-
-                if (match)
-                {
-                    // Se a entrada atual for a que queremos editar, substitua pelos novos valores
-                    temporario << newHistory.Cliente << ",";
-                    for (size_t i = 0; i < newHistory.Produto.size(); i++)
-                    {
-                        temporario << newHistory.Produto[i] << ",";
-                        temporario << newHistory.Quantidade[i] << ",";
-                    }
-                    temporario << newHistory.Observação << ","
-                               << oldHistory.Data << ","
-                               << oldHistory.Hora << "\n";
-                    encontrado = true;
-                }
-                else
-                {
-                    // Caso contrário, mantenha a entrada Origemal
-                    temporario << Cliente << ",";
-                    for (size_t i = 0; i < Produto.size(); i++)
-                    {
-                        temporario << Produto[i] << ",";
-                        temporario << Quantidade[i] << ",";
-                    }
-                    temporario << Observação << ","
-                               << Data << ","
+                    temporario << Cliente << "|"
+                               << Produto << "|"
+                               << Quantidade << "|"
+                               << Observação << "|"
+                               << Data << "|"
                                << Hora << "\n";
+                }
+                else
+                {
+                    encontrado = true;
                 }
             }
         }
@@ -187,10 +142,92 @@ void editHistory(const history &oldHistory, const history &newHistory)
 
         if (!encontrado)
         {
-            std::cout << "Solicitação não encontrada para edição." << std::endl;
+            std::cout << "Pedido não encontrado." << std::endl;
         }
     }
 }
+
+void editHistory(const history &oldHistory, const history &newHistory)
+{
+    std::fstream databaseOfHistorys("./database/historys.csv", std::ios::in);
+    if (!databaseOfHistorys.is_open())
+    {
+        std::cout << "Erro ao abrir o arquivo de solicitações." << std::endl;
+        return;
+    }
+
+    std::fstream temporario("./database/temp.csv", std::ios::out);
+    if (!temporario.is_open())
+    {
+        std::cout << "Erro ao criar arquivo temporário." << std::endl;
+        databaseOfHistorys.close();
+        return;
+    }
+
+    std::string listProduto, listQuantidade, listObservação, novoProduto, novaQuantidade, novaObservação;
+    listProduto = createStringList(oldHistory.Produto);
+    listQuantidade = createStringList(oldHistory.Quantidade);
+    listObservação = createStringList(oldHistory.Observação);
+    novoProduto = createStringList(newHistory.Produto);
+    novaQuantidade = createStringList(newHistory.Quantidade);
+    novaObservação = createStringList(newHistory.Observação);
+
+    bool encontrado = false;
+    std::string line;
+    while (std::getline(databaseOfHistorys, line))
+    {
+        std::istringstream iss(line);
+        std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+
+        if (std::getline(iss, Cliente, '|') &&
+            std::getline(iss, Produto, '|') &&
+            std::getline(iss, Quantidade, '|') &&
+            std::getline(iss, Observação, '|') &&
+            std::getline(iss, Data, '|') &&
+            std::getline(iss, Hora, '\n'))
+        {
+            if (oldHistory.Cliente == Cliente &&
+                oldHistory.Data == Data &&
+                oldHistory.Hora == Hora &&
+                listObservação == Observação &&
+                listProduto == Produto &&
+                listQuantidade == Quantidade)
+            {
+                encontrado = true;
+                temporario << newHistory.Cliente << "|"
+                           << novoProduto << "|"
+                           << novaQuantidade << "|"
+                           << novaObservação << "|"
+                           << oldHistory.Data << "|"
+                           << oldHistory.Hora << "\n";
+            }
+            else
+            {
+                temporario << Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << Data << "|"
+                           << Hora << "\n";
+            }
+        }
+    }
+
+    databaseOfHistorys.close();
+    temporario.close();
+
+    if (!encontrado)
+    {
+        std::cout << "Solicitação não encontrada para edição." << std::endl;
+        remove("./database/temp.csv"); // Remove o arquivo temporário, pois não foi usado.
+    }
+    else
+    {
+        remove("./database/historys.csv"); // Remove o arquivo original.
+        rename("./database/temp.csv", "./database/historys.csv"); // Renomeia o arquivo temporário.
+    }
+}
+
 
 history historyMap(json jsonResponse, std::string premissa)
 {
@@ -237,6 +274,13 @@ void saveHistory(json jsonResponse)
     newHistory.Hora = timeBuffer;
 
     addHistory(newHistory);
+    return;
+}
+
+void deleteHistory(json jsonResponse)
+{
+    history deleteHistory = historyMap(jsonResponse, "");
+    dellHistory(deleteHistory);
     return;
 }
 

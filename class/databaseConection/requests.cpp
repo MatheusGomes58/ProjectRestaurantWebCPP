@@ -1,9 +1,36 @@
+std::string createStringList(const std::vector<std::string> &observacaoList)
+{
+    std::string observacao;
+    for (size_t i = 0; i < observacaoList.size(); i++)
+    {
+        if (i > 0)
+        {
+            observacao += ";";
+        }
+        observacao += observacaoList[i];
+    }
+    return observacao;
+}
+
+// Função auxiliar para dividir uma string com um delimitador
+std::vector<std::string> splitString(const std::string &input, char delimiter)
+{
+    std::vector<std::string> result;
+    std::istringstream iss(input);
+    std::string token;
+    while (std::getline(iss, token, delimiter))
+    {
+        result.push_back(token);
+    }
+    return result;
+}
+
 struct request
 {
     std::string Cliente;
     std::vector<std::string> Produto;
     std::vector<std::string> Quantidade;
-    std::string Observação;
+    std::vector<std::string> Observação;
     std::string Data;
     std::string Hora;
 };
@@ -15,27 +42,16 @@ void addRequest(const request &request)
     std::fstream databaseOfRequests("./database/requests.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfRequests.is_open())
     {
-        std::string Produto, Quantidade;
+        std::string Produto, Quantidade, Observação;
+        Produto = createStringList(request.Produto);
+        Quantidade = createStringList(request.Quantidade);
+        Observação = createStringList(request.Observação);
 
-        for (size_t i = 0; i < request.Produto.size(); i++)
-        {
-            if (Produto.size() > 1)
-            {
-                Produto += ";";
-            }
-            if (Quantidade.size() >= 1)
-            {
-                Quantidade += ";";
-            }
-            Produto += request.Produto[i];
-            Quantidade += request.Quantidade[i];
-        }
-
-        databaseOfRequests << request.Cliente << ","
-                           << Produto << ","
-                           << Quantidade << ","
-                           << request.Observação << ","
-                           << request.Data << ","
+        databaseOfRequests << request.Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << request.Data << "|"
                            << request.Hora << "\n";
 
         databaseOfRequests.close();
@@ -60,12 +76,12 @@ void listRequests()
             std::istringstream iss(line);
             std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, Cliente, ',') &&
-                std::getline(iss, Produto, ',') &&
-                std::getline(iss, Quantidade, ',') &&
-                std::getline(iss, Observação, ',') &&
-                std::getline(iss, Data, ',') &&
-                std::getline(iss, Hora, '\n'))
+            if (std::getline(iss, Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, Data, '|') &&
+                (std::getline(iss, Hora, '\n')||""))
             {
                 // Criar um objeto JSON para representar a solicitação
                 json requestJson;
@@ -74,9 +90,10 @@ void listRequests()
                 requestJson["Hora"] = Hora;
                 std::vector<std::string> products = splitString(Produto, ';');
                 std::vector<std::string> quantities = splitString(Quantidade, ';');
+                std::vector<std::string> observations = splitString(Observação, ';');
                 requestJson["Produto"] = products;
                 requestJson["Quantidade"] = quantities;
-                requestJson["Observação"] = Observação;
+                requestJson["Observação"] = observations;
                 requestJson["Origem"] = "request";
 
                 // Converter o objeto JSON em uma string e adicionar à lista
@@ -105,21 +122,10 @@ void dellRequest(const request &request)
             return;
         }
 
-        std::string Produto_requisicao, Quantidade_requisicao;
-
-        for (size_t i = 0; i < request.Produto.size(); i++)
-        {
-            if (Produto_requisicao.size() > 1)
-            {
-                Produto_requisicao += ";";
-            }
-            if (Quantidade_requisicao.size() >= 1)
-            {
-                Quantidade_requisicao += ";";
-            }
-            Produto_requisicao += request.Produto[i];
-            Quantidade_requisicao += request.Quantidade[i];
-        }
+        std::string listProduto, listQuantidade, listObservação;
+        listProduto = createStringList(request.Produto);
+        listQuantidade = createStringList(request.Quantidade);
+        listObservação = createStringList(request.Observação);
 
         bool encontrado = false;
         std::string line;
@@ -128,26 +134,26 @@ void dellRequest(const request &request)
             std::istringstream iss(line);
             std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
 
-            if (std::getline(iss, Cliente, ',') &&
-                std::getline(iss, Produto, ',') &&
-                std::getline(iss, Quantidade, ',') &&
-                std::getline(iss, Observação, ',') &&
-                std::getline(iss, Data, ',') &&
-                std::getline(iss, Hora, ';'))
+            if (std::getline(iss, Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, Data, '|') &&
+                std::getline(iss, Hora, '\n'))
             {
                 if (!(request.Cliente == Cliente &&
                       request.Data == Data &&
                       request.Hora == Hora &&
-                      request.Observação == Observação &&
-                      Produto_requisicao == Produto &&
-                      Quantidade_requisicao == Quantidade))
+                      listObservação == Observação &&
+                      listProduto == Produto &&
+                      listQuantidade == Quantidade))
                 {
-                    temporario << Cliente << ","
-                                       << Produto << ","
-                                       << Quantidade << ","
-                                       << Observação << ","
-                                       << Data << ","
-                                       << Hora << "\n";
+                    temporario << Cliente << "|"
+                               << Produto << "|"
+                               << Quantidade << "|"
+                               << Observação << "|"
+                               << Data << "|"
+                               << Hora << "\n";
                 }
                 else
                 {
@@ -170,102 +176,85 @@ void dellRequest(const request &request)
 
 void editRequest(const request &oldRequest, const request &newRequest)
 {
-    std::fstream databaseOfRequests("./database/requests.csv", std::ios::app | std::ios::in | std::ios::out);
-    if (databaseOfRequests.is_open())
+    std::fstream databaseOfRequests("./database/requests.csv", std::ios::in);
+    if (!databaseOfRequests.is_open())
     {
-        std::fstream temporario("./database/temp.csv", std::ios::out);
-        if (!temporario)
-        {
-            std::cout << "Erro ao criar arquivo temporário." << std::endl;
-            return;
-        }
+        std::cout << "Erro ao abrir o arquivo de solicitações." << std::endl;
+        return;
+    }
 
-        bool encontrado = false;
-        std::string line;
-        while (std::getline(databaseOfRequests, line))
-        {
-            std::istringstream iss(line);
-            std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+    std::fstream temporario("./database/temp.csv", std::ios::out);
+    if (!temporario.is_open())
+    {
+        std::cout << "Erro ao criar arquivo temporário." << std::endl;
+        databaseOfRequests.close();
+        return;
+    }
 
-            if (std::getline(iss, Cliente, ',') &&
-                std::getline(iss, Produto, ',') &&
-                std::getline(iss, Quantidade, ',') &&
-                std::getline(iss, Observação, ',') &&
-                std::getline(iss, Data, ',') &&
-                std::getline(iss, Hora, ';'))
+    std::string listProduto, listQuantidade, listObservação, novoProduto, novaQuantidade, novaObservação;
+    listProduto = createStringList(oldRequest.Produto);
+    listQuantidade = createStringList(oldRequest.Quantidade);
+    listObservação = createStringList(oldRequest.Observação);
+    novoProduto = createStringList(newRequest.Produto);
+    novaQuantidade = createStringList(newRequest.Quantidade);
+    novaObservação = createStringList(newRequest.Observação);
+
+    bool encontrado = false;
+    std::string line;
+    while (std::getline(databaseOfRequests, line))
+    {
+        std::istringstream iss(line);
+        std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+
+        if (std::getline(iss, Cliente, '|') &&
+            std::getline(iss, Produto, '|') &&
+            std::getline(iss, Quantidade, '|') &&
+            std::getline(iss, Observação, '|') &&
+            std::getline(iss, Data, '|') &&
+            std::getline(iss, Hora, '\n'))
+        {
+            if (oldRequest.Cliente == Cliente &&
+                oldRequest.Data == Data &&
+                oldRequest.Hora == Hora &&
+                listObservação == Observação &&
+                listProduto == Produto &&
+                listQuantidade == Quantidade)
             {
-
-                bool match = true;
-
-                if (oldRequest.Cliente == Cliente &&
-                    oldRequest.Data == Data &&
-                    oldRequest.Hora == Hora &&
-                    oldRequest.Observação == Observação)
-                {
-                    if (oldRequest.Produto.size() == Produto.size() &&
-                        oldRequest.Quantidade.size() == Quantidade.size())
-                    {
-                        for (size_t i = 0; i < oldRequest.Produto.size(); i++)
-                        {
-                            if (oldRequest.Produto[i] != Produto ||
-                                oldRequest.Quantidade[i] != Quantidade)
-                            {
-                                match = false;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        match = false;
-                    }
-                }
-                else
-                {
-                    match = false;
-                }
-
-                if (match)
-                {
-                    // Se a entrada atual for a que queremos editar, substitua pelos novos valores
-                    temporario << newRequest.Cliente << ",";
-                    for (size_t i = 0; i < newRequest.Produto.size(); i++)
-                    {
-                        temporario << newRequest.Produto[i] << ",";
-                        temporario << newRequest.Quantidade[i] << ",";
-                    }
-                    temporario << newRequest.Observação << ","
-                               << oldRequest.Data << ","
-                               << oldRequest.Hora << "\n";
-                    encontrado = true;
-                }
-                else
-                {
-                    // Caso contrário, mantenha a entrada Origemal
-                    temporario << Cliente << ",";
-                    for (size_t i = 0; i < Produto.size(); i++)
-                    {
-                        temporario << Produto[i] << ",";
-                        temporario << Quantidade[i] << ",";
-                    }
-                    temporario << Observação << ","
-                               << Data << ","
-                               << Hora << "\n";
-                }
+                encontrado = true;
+                temporario << newRequest.Cliente << "|"
+                           << novoProduto << "|"
+                           << novaQuantidade << "|"
+                           << novaObservação << "|"
+                           << oldRequest.Data << "|"
+                           << oldRequest.Hora << "\n";
+            }
+            else
+            {
+                temporario << Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << Data << "|"
+                           << Hora << "\n";
             }
         }
+    }
 
-        temporario.close();
-        databaseOfRequests.close();
-        remove("./database/requests.csv");
-        rename("./database/temp.csv", "./database/requests.csv");
+    databaseOfRequests.close();
+    temporario.close();
 
-        if (!encontrado)
-        {
-            std::cout << "Solicitação não encontrada para edição." << std::endl;
-        }
+    if (!encontrado)
+    {
+        std::cout << "Solicitação não encontrada para edição." << std::endl;
+        remove("./database/temp.csv"); // Remove o arquivo temporário, pois não foi usado.
+    }
+    else
+    {
+        remove("./database/requests.csv"); // Remove o arquivo original.
+        rename("./database/temp.csv", "./database/requests.csv"); // Renomeia o arquivo temporário.
     }
 }
+
 
 request requestMap(json jsonResponse, std::string premissa)
 {

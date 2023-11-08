@@ -6,7 +6,7 @@
 void loadHtmlFileIntoString(const std::string &filename, std::string &targetString)
 {
     listRequests();
-    listPlates();
+    listProducts();
     listClients();
     listHistorys();
 
@@ -28,10 +28,10 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
                        "Content-Type: text/html; charset=UTF-8\r\n\r\n";
         targetString.append(fileContents.begin(), fileContents.end());
         targetString.append("<script>renderRequests('" + listofRequests + "')</script>");
-        targetString.append("<script>renderPlates('" + listofPlates + "')</script>");
+        targetString.append("<script>renderProducts('" + listofProducts + "')</script>");
         targetString.append("<script>renderUsers('" + listofClients + "')</script>");
         targetString.append("<script>renderHistory('" + listofHistorys + "')</script>");
-        if (!(listofClients.length() > 0 && listofPlates.length() > 0))
+        if (!(listofClients.length() > 0 && listofProducts.length() > 0))
         {
             targetString.append("<script>disableRequest()</script>");
         }

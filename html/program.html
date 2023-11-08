@@ -52,13 +52,13 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Pratos
+                            Produtos
                         </a>
                         <ul class="dropdown-menu bg-dark">
                             <li><a class="dropdown-item" style="color: white;"
                                     onclick="toggleSection('updateProduct')">Atualizar</a></li>
                             <li><a class="dropdown-item" style="color: white;"
-                                    onclick="openModal('plates')">Cadastrar</a></li>
+                                    onclick="openModal('products')">Cadastrar</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -70,7 +70,8 @@
                             <li><a class="dropdown-item" style="color: white;"
                                     onclick="toggleSection('updateClient')">Atualizar</a></li>
                             <li><a class="dropdown-item" style="color: white;"
-                                    onclick="openModal('cliente')">Cadastrar</a></li>
+                                    onclick="openModal('cliente')">Cadastrar</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item" id="requestCreate">
@@ -122,7 +123,24 @@
             <div class="container">
                 <h1 class="text-center mt-5">Menu do Restaurante</h1>
             </div>
-            <div class="row mt-4" id="menuList" style="justify-content: center;"></div>
+            <div style="width: 100%; height: auto; background-color: aliceblue;">
+                <div class="container">
+                    <h3 class="text-center mt-5">Products</h3>
+                </div>
+                <div class="row mt-4" id="platesList" style="justify-content: center;"></div>
+            </div>
+            <div style="width: 100%; height: auto; background-color: rgb(240, 255, 244);">
+                <div class="container">
+                    <h3 class="text-center mt-5">Bebidas</h3>
+                </div>
+                <div class="row mt-4" id="drinksList" style="justify-content: center;"></div>
+            </div>
+            <div style="width: 100%; height: auto; background-color: rgb(252, 240, 255);">
+                <div class="container">
+                    <h3 class="text-center mt-5">Sobremesas</h3>
+                </div>
+                <div class="row mt-4" id="dessertList" style="justify-content: center;"></div>
+            </div>
         </section>
         <section id="history" class="sections">
         </section>
@@ -173,8 +191,7 @@
                     <div id="product_example">
                         <div class="row" style="margin-top: 1%;">
                             <div class="col-6">
-                                <select class="form-control" name="Produto" id="product_example_select"
-                                    required>
+                                <select class="form-control" name="Produto" id="product_example_select" required>
                                 </select>
                             </div>
                             <div class="col-6">
@@ -210,7 +227,9 @@
                     var index_request = document.getElementById('index_request').value;
                     var Cliente = document.getElementById('Cliente').value;
                     var Observação = document.getElementById('Observação').value;
-                    Observação = Observação.replace(/\n/g, '*');
+
+                    // Dividir a Observação em uma lista usando a quebra de linha
+                    var ObservaçãoLista = Observação.split('\n').map(item => item.trim());
 
                     var jsonData;
                     if (!index_request) {
@@ -219,7 +238,7 @@
                             Cliente: Cliente,
                             Produto: Produto,
                             Quantidade: Quantidade,
-                            Observação: Observação
+                            Observação: ObservaçãoLista, // Enviar Observação como uma lista
                         };
                     } else {
                         var item = listOfJson[index_request];
@@ -235,10 +254,10 @@
                             Cliente: Cliente,
                             Produto: Produto,
                             Quantidade: Quantidade,
-                            Observação: Observação
+                            Observação: ObservaçãoLista, // Enviar Observação como uma lista
                         };
                     }
-                    sendJsonToBack(jsonData)
+                    sendJsonToBack(jsonData);
                 }
             </script>
         </div>
@@ -267,18 +286,18 @@
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="name_client">Nome do Cliente:</label>
-                    <input type="text" class="form-control" id="name_client" name="name_cliente" required>
+                    <label for="Nome">Nome do Cliente:</label>
+                    <input type="text" class="form-control" id="Nome" name="Nomee" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="email_client">Email do Cliente:</label>
-                    <input type="email" class="form-control" id="email_client" name="email_cliente" required>
+                    <label for="Email">Email do Cliente:</label>
+                    <input type="email" class="form-control" id="Email" name="Emaile" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="number_client">Numero do Cliente:</label>
-                    <input type="number" class="form-control" id="number_client" name="number_client" required>
+                    <label for="Numero">Numero do Cliente:</label>
+                    <input type="number" class="form-control" id="Numero" name="Numero" required>
                 </div>
 
                 <div style="display:flex; width: 100%; margin-top: 1%; align-items: center; justify-content: center;">
@@ -290,30 +309,30 @@
 
                     // Obter os valores dos campos do formulário
                     const index_client = document.getElementById('index_client').value;
-                    const nameCliente = document.getElementById('name_client').value;
-                    const emailCliente = document.getElementById('email_client').value;
-                    const number_client = document.getElementById('number_client').value.toString();
+                    const nameCliente = document.getElementById('Nome').value;
+                    const emailCliente = document.getElementById('Email').value;
+                    const Numero = document.getElementById('Numero').value.toString();
 
                     // Montar um objeto JSON com os valores
                     var jsonData;
                     if (!index_client) {
                         jsonData = {
                             type: "clients",
-                            name_client: nameCliente,
-                            email_client: emailCliente,
-                            number_client: number_client
+                            Nome: nameCliente,
+                            Email: emailCliente,
+                            Numero: Numero
                         };
                     } else {
                         var item = listOfJson[index_client];
                         jsonData = {
                             type: "clientUpdate",
-                            old_name_client: item.name_client,
-                            old_email_client: item.email_client,
-                            old_number_client: item.number_client,
+                            old_Nome: item.Nome,
+                            old_Email: item.Email,
+                            old_Numero: item.Numero,
 
-                            name_client: nameCliente,
-                            email_client: emailCliente,
-                            number_client: number_client
+                            Nome: nameCliente,
+                            Email: emailCliente,
+                            Numero: Numero
                         };
                     }
                     sendJsonToBack(jsonData);
@@ -328,51 +347,59 @@
 
 
     <!--##################################################
-        Modal de cadastro de plates
+        Modal de cadastro de products
     #####################################################-->
-    <div class="modal" id="plates" style="padding: 3%;">
+    <div class="modal" id="products" style="padding: 3%;">
         <div class="card bg-dark text-white">
             <div class="card-header">
-                <button class="btn btn-outline-secondary" onclick="closeModal('plates')">
+                <button class="btn btn-outline-secondary" onclick="closeModal('products')">
                     <i class="fas fa-times"></i>
                 </button>
-                Preencha as informações para cadastrar um plate
+                Preencha as informações para cadastrar um produto
             </div>
             <div class="card-body">
                 <div class="form-group" style="margin-top: 1%;" hidden>
-                    <label for="index_plate">Index:</label>
-                    <input type="number" class="form-control" id="index_plate" name="index_plate" required>
+                    <label for="index_product">Index:</label>
+                    <input type="number" class="form-control" id="index_product" name="index_product" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="name_plate">Nome do Prato:</label>
-                    <input type="text" class="form-control" id="name_plate" name="name_plate" required>
+                    <label for="Product">Nome do Produto:</label>
+                    <input type="text" class="form-control" id="Product" name="Product" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="picture_plate">Link da Foto do Prato:</label>
-                    <input type="text" class="form-control" id="picture_plate" name="picture_plate" required>
+                    <label for="Origem">Tipo de Produto:</label>
+                    <select class="form-control" id="Origem" name="Origem" required>
+                        <option value="plates">Prato</option>
+                        <option value="drinks">Bebida</option>
+                        <option value="dessert">Sobremesas</option>
+                    </select>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="desciption_plate">Descrição do Prato:</label>
-                    <textarea class="form-control" id="desciption_plate" name="desciption_plate" rows="4"
-                        required></textarea>
+                    <label for="Foto">Link da Foto do Produto:</label>
+                    <input type="text" class="form-control" id="Foto" name="Foto" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="price_plate">Preço do Prato (R$):</label>
-                    <input type="number" class="form-control" id="price_plate" name="price_plate" step="0.01" required>
+                    <label for="Descrição">Descrição do Produto:</label>
+                    <textarea class="form-control" id="Descrição" name="Descrição" rows="4" required></textarea>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="time_ready">Tempo Médio de Preparo (minutos):</label>
-                    <input type="number" class="form-control" id="time_ready" name="time_ready" required>
+                    <label for="Preço">Preço do Produto (R$):</label>
+                    <input type="number" class="form-control" id="Preço" name="Preço" step="0.2" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="quantity_free">Quantidade Disponível:</label>
-                    <input type="number" class="form-control" id="quantity_free" name="quantity_free" required>
+                    <label for="Tempo">Tempo Médio de Preparo (minutos):</label>
+                    <input type="number" class="form-control" id="Tempo" name="Tempo" required>
+                </div>
+
+                <div class="form-group" style="margin-top: 1%;">
+                    <label for="Quantidade">Quantidade:</label>
+                    <input type="number" class="form-control" id="Quantidade" name="Quantidade" required>
                 </div>
 
                 <div class="form-group mt-3">
@@ -381,67 +408,71 @@
                 </div>
 
                 <div style="display:flex; width: 100%; margin-top: 1%; align-items: center; justify-content: center;">
-                    <button class="btn btn-outline-secondary" onclick="submitJsonplate()">Cadastrar prato</button>
+                    <button class="btn btn-outline-secondary" onclick="submitJsonproduct()">Cadastrar Produto</button>
                 </div>
             </div>
             <script>
-                function submitJsonplate() {
+                function submitJsonproduct() {
                     // Obter os valores dos campos do formulário
-                    const index_plate = document.getElementById("index_plate").value;
-                    const nameplate = document.getElementById('name_plate').value;
-                    const fotoplate = document.getElementById('picture_plate').value;
-                    const descricaoplate = document.getElementById('desciption_plate').value;
-                    const precoplate = document.getElementById('price_plate').value.toString();
-                    const tempoPreparo = document.getElementById('time_ready').value.toString();
-                    const quantidadeDisponivel = document.getElementById('quantity_free').value.toString();
+                    const index_product = document.getElementById("index_product").value;
+                    const origemproduct = document.getElementById('Origem').value;
+                    const nameproduct = document.getElementById('Product').value;
+                    const fotoproduct = document.getElementById('Foto').value;
+                    const descricaoproduct = document.getElementById('Descrição').value;
+                    const precoproduct = document.getElementById('Preço').value.toString();
+                    const tempoPreparo = document.getElementById('Tempo').value.toString();
+                    const quantidadeDisponivel = document.getElementById('Quantidade').value.toString();
 
                     // Montar um objeto JSON com os valores
                     var jsonData;
-                    if (!index_plate) {
+                    if (!index_product) {
                         jsonData = {
-                            type: "plates",
-                            name_plate: nameplate,
-                            picture_plate: fotoplate,
-                            desciption_plate: descricaoplate,
-                            price_plate: precoplate,
-                            time_ready: tempoPreparo,
-                            quantity_free: quantidadeDisponivel
+                            type: "products",
+                            Origem: origemproduct,
+                            Produto: nameproduct,
+                            Foto: fotoproduct,
+                            Descrição: descricaoproduct,
+                            Preço: precoproduct,
+                            Tempo: tempoPreparo,
+                            Quantidade: quantidadeDisponivel
                         };
                     } else {
-                        var item = listOfJson[index_plate];
+                        var item = listOfJson[index_product];
                         jsonData = {
-                            type: "plateUpdate",
-                            old_name_plate: item.name_plate,
-                            old_picture_plate: item.picture_plate,
-                            old_desciption_plate: item.desciption_plate,
-                            old_price_plate: item.price_plate,
-                            old_time_ready: item.time_ready,
-                            old_quantity_free: item.quantity_free,
+                            type: "productUpdate",
+                            old_Origem: item.Origem,
+                            old_Produto: item.Produto,
+                            old_Foto: item.Foto,
+                            old_Descrição: item.Descrição,
+                            old_Preço: item.Preço,
+                            old_Tempo: item.Tempo,
+                            old_Quantidade: item.Quantidade,
 
-                            name_plate: nameplate,
-                            picture_plate: fotoplate,
-                            desciption_plate: descricaoplate,
-                            price_plate: precoplate,
-                            time_ready: tempoPreparo,
-                            quantity_free: quantidadeDisponivel
+                            Origem: origemproduct,
+                            Produto: nameproduct,
+                            Foto: fotoproduct,
+                            Descrição: descricaoproduct,
+                            Preço: precoproduct,
+                            Tempo: tempoPreparo,
+                            Quantidade: quantidadeDisponivel
                         };
                     }
                     sendJsonToBack(jsonData);
                 }
 
                 // Função para atualizar a imagem de visualização
-                document.getElementById('picture_plate').addEventListener('input', function () {
+                document.getElementById('Foto').addEventListener('input', function () {
                     const imagemPreview = document.getElementById('imagem_preview');
-                    const fotoplate = this.value;
+                    const fotoproduct = this.value;
 
                     // Atualize a imagem de visualização com o link informado
-                    imagemPreview.src = fotoplate;
+                    imagemPreview.src = fotoproduct;
                 });
             </script>
         </div>
     </div>
     <!--##################################################
-        Modal de cadastro de plates
+        Modal de cadastro de products
     #####################################################-->
 
 
@@ -493,7 +524,7 @@
             }
         }
 
-        function renderPlates(dateList) {
+        function renderProducts(dateList) {
             if (dateList && dateList.length > 0) {
                 document.getElementById("updateProduct").innerHTML = renderTable(dateList, true);
                 document.getElementById("product_example_select").innerHTML = renderOptions(dateList);
@@ -521,9 +552,9 @@
             for (var i = 0; i < dateList.length; i++) {
                 var option;
                 if (client) {
-                    option = dateList[i].name_client;
+                    option = dateList[i].Nome;
                 } else {
-                    option = dateList[i].name_plate;
+                    option = dateList[i].Product;
                 }
                 optionlist += '<option>' + option + '</option>';
             }
@@ -549,7 +580,17 @@
             for (var i = 0; i < dateList.length; i++) {
                 table += '<tr style="max-width:100%">';
                 for (var key in dateList[i]) {
-                    table += '<td>' + dateList[i][key] + '</td>';
+                    table += '<td>';
+                    if (Array.isArray(dateList[i][key])) {
+                        // Se dateList[i][key] for uma lista, insira cada item com quebra de linha
+                        for (var j = 0; j < dateList[i][key].length; j++) {
+                            table += dateList[i][key][j] + '<br>';
+                        }
+                    } else {
+                        // Caso contrário, apenas insira o valor normalmente
+                        table += dateList[i][key];
+                    }
+                    table += '</td>';
                 }
                 if (edit) {
                     listOfJson.push(dateList[i]);
@@ -566,26 +607,35 @@
 
 
         function renderMenuList(dateList) {
-            document.getElementById("menuList").innerHTML = "";
             dateList = preparateJsonList(dateList);
             for (var i = 0; i < dateList.length; i++) {
-                var menuList = `
+                var productsList = "";
+                productsList += `
                     <div class="col-md-3" style="margin:2%;">
-                        <div class="card">
-                            <img src="${dateList[i]["picture_plate"]}" class="card-img-top" alt="${dateList[i]["picture_plate"]}">
-                            <div class="card-body">
-                                <h5 class="card-title">${dateList[i]["name_plate"]}</h5>
-                                <p class="card-text">${dateList[i]["desciption_plate"]}</p>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">R$: ${dateList[i]["price_plate"]}</li>
-                                    <li class="list-group-item">Tempo: ${dateList[i]["time_ready"]}</li>
-                                    <li class="list-group-item">Quantidade disponivel: ${dateList[i]["quantity_free"]}</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById("menuList").innerHTML += menuList;
+                        <div class="card">`
+                if (dateList[i]["Foto"]) {
+                    productsList += `<img src="${dateList[i]["Foto"]}" class="card-img-top" alt="${dateList[i]["Foto"]}">`
+                }
+                productsList += `<div class="card-body">`
+                if (dateList[i]["Product"]) {
+                    productsList += `<h5 class="card-title">${dateList[i]["Product"]}</h5>`
+                }
+                if (dateList[i]["Descrição"]) {
+                    productsList += `<p class="card-text">${dateList[i]["Descrição"]}</p>`
+                }
+                productsList += `<ul class="list-group list-group-flush">`
+                if (dateList[i]["Preço"]) {
+                    productsList += `<li class="list-group-item">R$: ${dateList[i]["Preço"]}</li>`
+                }
+                if (dateList[i]["Tempo"]) {
+                    productsList += `<li class="list-group-item">Tempo: ${dateList[i]["Tempo"]}</li>`
+                }
+                if (dateList[i]["Quantidade"]) {
+                    productsList += `<li class="list-group-item">Quantidade disponivel: ${dateList[i]["Quantidade"]}</li>`
+                }
+                productsList += `</ul></div></div></div>`;
+
+                document.getElementById(dateList[i]["Origem"] + "List").innerHTML += productsList;
             }
         }
 
@@ -599,25 +649,28 @@
                 for (let i = 1; i < item.Produto.length; i++) {
                     addProduct(item.Produto[i], item.Quantidade[i]);
                 }
-                document.getElementById('Observação').value = item.Observação.replace("*", "\n");
+                for (let i = 0; i < item.Observação.length; i++) {
+                    if (i > 0) {
+                        document.getElementById('Observação').value += "\n";
+                    }
+                    document.getElementById('Observação').value += item.Observação[i];
+                }
                 openModal('pedidos');
-            } else if (item.Origem == "plate") {
-                document.getElementById('index_plate').value = index;
-                document.getElementById('name_plate').value = item.name_plate;
-                document.getElementById('desciption_plate').value = item.desciption_plate;
-                document.getElementById('picture_plate').value = item.picture_plate;
-                document.getElementById('price_plate').value = item.price_plate;
-                document.getElementById('quantity_free').value = item.quantity_free;
-                document.getElementById('time_ready').value = item.time_ready;
-                openModal('plates');
             } else if (item.Origem == "client") {
                 document.getElementById('index_client').value = index;
-                document.getElementById('name_client').value = item.name_client;
-                document.getElementById('email_client').value = item.email_client;
-                document.getElementById('number_client').value = item.number_client;
+                document.getElementById('Nome').value = item.Nome;
+                document.getElementById('Email').value = item.Email;
+                document.getElementById('Numero').value = item.Numero;
                 openModal('cliente');
             } else {
-                alert("Não é permitido editar esse dado")
+                document.getElementById('index_product').value = index;
+                document.getElementById('Product').value = item.Product;
+                document.getElementById('Descrição').value = item.Descrição;
+                document.getElementById('Foto').value = item.Foto;
+                document.getElementById('Preço').value = item.Preço;
+                document.getElementById('Quantidade').value = item.Quantidade;
+                document.getElementById('Tempo').value = item.Tempo;
+                openModal('products');
             }
         }
 
@@ -648,16 +701,16 @@
 
         function addProduct(productValue, quantityValue) {
             const productExample = document.getElementById("product_example");
-            const newPlates = productExample.cloneNode(true);
+            const newProducts = productExample.cloneNode(true);
             if (productValue !== undefined && quantityValue !== undefined) {
-                const selectElement = newPlates.querySelector("#product_example_select");
-                const quantityInput = newPlates.querySelector("#Quantidade");
+                const selectElement = newProducts.querySelector("#product_example_select");
+                const quantityInput = newProducts.querySelector("#Quantidade");
 
                 selectElement.value = productValue;
                 quantityInput.value = quantityValue;
             }
-            const platesList = document.getElementById("Produto");
-            platesList.appendChild(newPlates);
+            const productsList = document.getElementById("Produto");
+            productsList.appendChild(newProducts);
         }
 
 
