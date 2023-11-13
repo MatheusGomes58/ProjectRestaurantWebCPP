@@ -232,20 +232,31 @@
             </div>
             <script>
                 function submitJsonrequests() {
+                    // Obter os valores dos campos do formulário
+                    var index_request = document.getElementById('index_request').value;
+                    var Cliente = document.getElementById('Cliente').value;
+                    var Observação = document.getElementById('Observação').value;
+                    var valorTotal = document.getElementById('ValorTotal').textContent.replace("R$ ", "");
+
+                    // Dividir a Observação em uma lista usando a quebra de linha
+                    var ObservaçãoLista = Observação.split('\n').map(item => item.trim());
+
+                    // Obter os valores dos campos Produto e Quantidade
                     var ProdutoInputs = document.querySelectorAll("#Produto select[name='Produto']");
                     var Produto = Array.from(ProdutoInputs).map(input => input.value.trim());
 
                     var quantityInputs = document.querySelectorAll("#Produto input[name='Quantidade']");
                     var Quantidade = Array.from(quantityInputs).map(input => input.value.trim().toString());
 
-                    // Obter os valores dos campos do formulário
-                    var index_request = document.getElementById('index_request').value;
-                    var Cliente = document.getElementById('Cliente').value;
-                    var Observação = document.getElementById('Observação').value;
+                    // Validar se todos os campos estão preenchidos
+                    if (!Cliente || !valorTotal || Produto.length === 0 || Quantidade.length === 0
+                        || Produto[0] === "" || Quantidade[0] === "") {
+                        alert("Por favor, preencha todos os campos.");
+                        return; // Impede a continuação da execução da função se houver campos vazios.
+                    }
 
-                    // Dividir a Observação em uma lista usando a quebra de linha
-                    var ObservaçãoLista = Observação.split('\n').map(item => item.trim());
 
+                    // Montar um objeto JSON com os valores
                     var jsonData;
                     if (!index_request) {
                         jsonData = {
@@ -253,7 +264,9 @@
                             Cliente: Cliente,
                             Produto: Produto,
                             Quantidade: Quantidade,
-                            Observação: ObservaçãoLista, // Enviar Observação como uma lista
+                            Observação: ObservaçãoLista,
+                            Preço: valorTotal,
+                            Senha: "",
                         };
                     } else {
                         var item = listOfJson[index_request];
@@ -265,11 +278,14 @@
                             old_Observação: item.Observação,
                             old_Hora: item.Hora,
                             old_Data: item.Data,
+                            old_Senha: item.Senha,
+                            old_Preço: item.Preço,
 
                             Cliente: Cliente,
                             Produto: Produto,
                             Quantidade: Quantidade,
                             Observação: ObservaçãoLista, // Enviar Observação como uma lista
+                            Preço: valorTotal,
                         };
                     }
                     sendJsonToBack(jsonData);
@@ -315,18 +331,33 @@
                     <input type="number" class="form-control" id="Numero" name="Numero" required>
                 </div>
 
+                <div class="form-group" style="margin-top: 1%;">
+                    <label for="Preferencial">Classificação de Cliente:</label>
+                    <select class="form-control" name="Preferencial" id="Preferencial" required>
+                        <option>Preferencial</option>
+                        <option>Comum</option>
+                    </select>
+                </div>
+
                 <div style="display:flex; width: 100%; margin-top: 1%; align-items: center; justify-content: center;">
                     <button class="btn btn-outline-secondary" onclick="submitJsonClient()">Cadastrar Cliente</button>
                 </div>
             </div>
             <script>
                 function submitJsonClient() {
-
                     // Obter os valores dos campos do formulário
                     const index_client = document.getElementById('index_client').value;
                     const nameCliente = document.getElementById('Nome').value;
                     const emailCliente = document.getElementById('Email').value;
                     const Numero = document.getElementById('Numero').value.toString();
+                    const Preferencial = document.getElementById('Preferencial').value;
+
+                    // Validar se todos os campos estão preenchidos
+                    if (!nameCliente && !emailCliente && !Numero) {
+                        // Se algum campo estiver vazio, exiba uma mensagem de erro ou realize a ação apropriada.
+                        alert("Por favor, preencha todos os campos.");
+                        return; // Impede a continuação da execução da função se houver campos vazios.
+                    }
 
                     // Montar um objeto JSON com os valores
                     var jsonData;
@@ -335,7 +366,8 @@
                             type: "clients",
                             Nome: nameCliente,
                             Email: emailCliente,
-                            Numero: Numero
+                            Numero: Numero,
+                            Classificação: Preferencial
                         };
                     } else {
                         var item = listOfJson[index_client];
@@ -344,14 +376,17 @@
                             old_Nome: item.Nome,
                             old_Email: item.Email,
                             old_Numero: item.Numero,
+                            Classificação: item.Classificação,
 
                             Nome: nameCliente,
                             Email: emailCliente,
-                            Numero: Numero
+                            Numero: Numero,
+                            Classificação: Preferencial
                         };
                     }
                     sendJsonToBack(jsonData);
                 }
+
             </script>
         </div>
     </div>
@@ -441,6 +476,13 @@
                     const tempoPreparo = document.getElementById('Tempo').value.toString();
                     const quantidadeDisponivel = document.getElementById('QuantidadeProduto').value.toString();
                     console.log(quantidadeDisponivel)
+
+                    // Validar se todos os campos estão preenchidos
+                    if (!index_Produto && !nameProduto && !fotoProduto &&
+                        !precoProduto && !tempoPreparo && !quantidadeDisponivel) {
+                        alert("Por favor, preencha todos os campos.");
+                        return;
+                    }
 
                     // Montar um objeto JSON com os valores
                     var jsonData;
@@ -588,11 +630,11 @@
             // Defina a ordem desejada das colunas
             var columnOrder;
             if (dateList[0].Origem == "history") {
-                columnOrder = ['Senha','Data', 'Hora', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
-            }  if (dateList[0].Origem == 'request') {
+                columnOrder = ['Senha', 'Data', 'Hora', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
+            } if (dateList[0].Origem == 'request') {
                 columnOrder = ['Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
             } if (dateList[0].Origem == 'client') {
-                columnOrder = ['Nome', 'Email', 'Numero'];
+                columnOrder = ['Nome', 'Email', 'Numero', 'Classificação'];
             } if (dateList[0].Origem == 'plates' || dateList[0].Origem == 'drinks' || dateList[0].Origem == 'dessert') {
                 columnOrder = ['Produto', 'Descrição', 'Quantidade', 'Preço', 'Tempo'];
             }
@@ -738,12 +780,13 @@
                     console.error("Erro:", error);
                 });
 
-            //window.location.reload();
+            window.location.reload();
         }
 
         function addProduto(ProdutoValue, quantityValue, index) {
             const ProdutoExample = document.getElementById("Produto_example");
             const newProdutos = ProdutoExample.cloneNode(true);
+            const ProdutosList = document.getElementById("Produto");
 
             // Adicionando botão de exclusão
             const deleteButton = document.createElement("button");
@@ -765,6 +808,10 @@
             selectElement.value = ProdutoValue;
             quantityInput.value = quantityValue;
 
+            selectElement.id = "Produto_example_select" + index;
+            quantityInput.id = "Quantidade_Produto" + index;
+            valorLabel.id = "Valor" + index;
+
             // Use "onchange" em vez de "change"
             selectElement.onchange = function () {
                 exibirValor(index);
@@ -772,26 +819,37 @@
 
             quantityInput.onchange = function () {
                 exibirValor(index);
-            }; selectElement.change = "exibirValor(" + (index) + ")"
-            quantityInput.change = "exibirValor(" + (index) + ")"
+            };
 
             selectElement.id = "Produto_example_select" + index;
             quantityInput.id = "Quantidade_Produto" + index;
             valorLabel.id = "Valor" + index;
 
-            // Adicionando o botão de exclusão no final da linha
-            var newExcluir = newProdutos.querySelector("#ExcluirAqui");
-            var oldExcluir = document.querySelector("#ExcluirAqui");
-            var ExcluirCol = document.getElementById("ExcluirCol");
-            newExcluir.style.display = "block";
-            ExcluirCol.style.display = "block";
-            oldExcluir.style.display = "block";
-            newExcluir.appendChild(deleteButton);
+            // Verifica se a quantidade de clones é menor ou igual à quantidade de opções em Produto_example_select0
+            const optionCount = ProdutoExample.querySelectorAll('select option').length;
+            const existingClones = ProdutosList.querySelectorAll('.produto-clone').length;
 
-            const ProdutosList = document.getElementById("Produto");
-            ProdutosList.appendChild(newProdutos);
-            contadorDeItens++;
+            if (existingClones < optionCount - 1) {
+                // Adicionando o botão de exclusão no final da linha
+                var newExcluir = newProdutos.querySelector("#ExcluirAqui");
+                var oldExcluir = document.querySelector("#ExcluirAqui");
+                var ExcluirCol = document.getElementById("ExcluirCol");
+                newExcluir.style.display = "block";
+                ExcluirCol.style.display = "block";
+                oldExcluir.style.display = "block";
+                newExcluir.appendChild(deleteButton);
+
+                newProdutos.classList.add('produto-clone'); // Adiciona uma classe para identificar clones
+                ProdutosList.appendChild(newProdutos);
+                contadorDeItens++;
+                atualizarValorTotal();
+            } else {
+                // Adicione aqui a lógica ou feedback para indicar que o limite foi atingido
+                console.log("Limite de clones atingido. Não é possível adicionar mais.");
+            }
         }
+
+
 
         function checkAndHideDeleteButton() {
             const ProdutosList = document.getElementById("Produto");
@@ -845,8 +903,6 @@
             var valortotalElement = document.getElementById("ValorTotal");
             valortotalElement.innerHTML = "R$ " + valorTotal.toFixed(2);
         }
-
-
 
         toggleSection('menu')
     </script>

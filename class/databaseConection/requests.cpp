@@ -33,7 +33,7 @@ struct request
     std::vector<std::string> Observação;
     std::string Data;
     std::string Hora;
-    std::string Preço;
+    std::string Preco;
     std::string Senha;
 };
 
@@ -55,7 +55,7 @@ void addRequest(const request &request)
                            << Observação << "|"
                            << request.Data << "|"
                            << request.Hora << "|"
-                           << request.Preço << "|"
+                           << request.Preco << "|"
                            << request.Senha << "\n";
 
         databaseOfRequests.close();
@@ -157,16 +157,17 @@ void dellRequest(const request &request)
                       listObservação == Observação &&
                       listProduto == Produto &&
                       listQuantidade == Quantidade &&
-                      request.Preço == Preco))
+                      request.Preco == Preco &&
+                      request.Senha == Senha))
                 {
                     temporario << request.Cliente << "|"
-                           << Produto << "|"
-                           << Quantidade << "|"
-                           << Observação << "|"
-                           << Data << "|"
-                           << Hora << "|"
-                           << Preco << "|"
-                           << Senha << "\n";
+                               << Produto << "|"
+                               << Quantidade << "|"
+                               << Observação << "|"
+                               << Data << "|"
+                               << Hora << "|"
+                               << Preco << "|"
+                               << Senha << "\n";
                 }
                 else
                 {
@@ -217,21 +218,25 @@ void editRequest(const request &oldRequest, const request &newRequest)
     while (std::getline(databaseOfRequests, line))
     {
         std::istringstream iss(line);
-        std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+        std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
 
         if (std::getline(iss, Cliente, '|') &&
             std::getline(iss, Produto, '|') &&
             std::getline(iss, Quantidade, '|') &&
             std::getline(iss, Observação, '|') &&
             std::getline(iss, Data, '|') &&
-            std::getline(iss, Hora, '\n'))
+            std::getline(iss, Hora, '|') &&
+            std::getline(iss, Preco, '|') &&
+            std::getline(iss, Senha, '\n'))
         {
             if (oldRequest.Cliente == Cliente &&
                 oldRequest.Data == Data &&
                 oldRequest.Hora == Hora &&
                 listObservação == Observação &&
                 listProduto == Produto &&
-                listQuantidade == Quantidade)
+                listQuantidade == Quantidade &&
+                oldRequest.Preco == Preco &&
+                oldRequest.Senha == Senha)
             {
                 encontrado = true;
                 temporario << newRequest.Cliente << "|"
@@ -239,7 +244,9 @@ void editRequest(const request &oldRequest, const request &newRequest)
                            << novaQuantidade << "|"
                            << novaObservação << "|"
                            << oldRequest.Data << "|"
-                           << oldRequest.Hora << "\n";
+                           << oldRequest.Hora << "|"
+                           << newRequest.Preco << "|"
+                           << Senha << "\n";
             }
             else
             {
@@ -248,7 +255,9 @@ void editRequest(const request &oldRequest, const request &newRequest)
                            << Quantidade << "|"
                            << Observação << "|"
                            << Data << "|"
-                           << Hora << "\n";
+                           << Hora << "|"
+                           << Preco << "|"
+                           << Senha << "\n";
             }
         }
     }
@@ -263,11 +272,10 @@ void editRequest(const request &oldRequest, const request &newRequest)
     }
     else
     {
-        remove("./database/requests.csv"); // Remove o arquivo original.
+        remove("./database/requests.csv");                        // Remove o arquivo original.
         rename("./database/temp.csv", "./database/requests.csv"); // Renomeia o arquivo temporário.
     }
 }
-
 
 request requestMap(json jsonResponse, std::string premissa)
 {
@@ -295,6 +303,14 @@ request requestMap(json jsonResponse, std::string premissa)
     if (jsonResponse.contains(premissa + "Quantidade"))
     {
         request.Quantidade = jsonResponse[premissa + "Quantidade"];
+    }
+    if (jsonResponse.contains(premissa + "Preço"))
+    {
+        request.Preco = jsonResponse[premissa + "Preço"];
+    }
+    if (jsonResponse.contains(premissa + "Senha"))
+    {
+        request.Senha = jsonResponse[premissa + "Senha"];
     }
     return request;
 }

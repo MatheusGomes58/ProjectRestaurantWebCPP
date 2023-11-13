@@ -9,17 +9,6 @@ struct product
     std::string Tempo;
 };
 
-// Função para imprimir os campos de um produto
-void printProduct(const product &prod) {
-    std::cout << "Origem: " << prod.Origem << std::endl;
-    std::cout << "Descrição: " << prod.Descrição << std::endl;
-    std::cout << "Foto: " << prod.Foto << std::endl;
-    std::cout << "Produto: " << prod.Produto << std::endl;
-    std::cout << "Preço: " << prod.Preço << std::endl;
-    std::cout << "Quantidade: " << prod.Quantidade << std::endl;
-    std::cout << "Tempo: " << prod.Tempo << std::endl;
-}
-
 std::string listofProducts;
 
 void addProduct(const product &product)
@@ -151,7 +140,6 @@ void editProduct(const product &oldProduct, const product &newProduct)
             std::cout << "Erro ao criar arquivo temporário." << std::endl;
             return;
         }
-        printProduct(oldProduct);
 
         bool encontrado = false;
         std::string line;
