@@ -33,6 +33,8 @@ struct request
     std::vector<std::string> Observação;
     std::string Data;
     std::string Hora;
+    std::string Preço;
+    std::string Senha;
 };
 
 std::string listofRequests;
@@ -52,7 +54,9 @@ void addRequest(const request &request)
                            << Quantidade << "|"
                            << Observação << "|"
                            << request.Data << "|"
-                           << request.Hora << "\n";
+                           << request.Hora << "|"
+                           << request.Preço << "|"
+                           << request.Senha << "\n";
 
         databaseOfRequests.close();
     }
@@ -74,14 +78,16 @@ void listRequests()
         while (std::getline(databaseOfRequests, line))
         {
             std::istringstream iss(line);
-            std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+            std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
 
             if (std::getline(iss, Cliente, '|') &&
                 std::getline(iss, Produto, '|') &&
                 std::getline(iss, Quantidade, '|') &&
                 std::getline(iss, Observação, '|') &&
                 std::getline(iss, Data, '|') &&
-                (std::getline(iss, Hora, '\n')||""))
+                std::getline(iss, Hora, '|') &&
+                std::getline(iss, Preco, '|') &&
+                std::getline(iss, Senha, '\n'))
             {
                 // Criar um objeto JSON para representar a solicitação
                 json requestJson;
@@ -94,6 +100,8 @@ void listRequests()
                 requestJson["Produto"] = products;
                 requestJson["Quantidade"] = quantities;
                 requestJson["Observação"] = observations;
+                requestJson["Preço"] = Preco;
+                requestJson["Senha"] = Senha;
                 requestJson["Origem"] = "request";
 
                 // Converter o objeto JSON em uma string e adicionar à lista
@@ -132,28 +140,33 @@ void dellRequest(const request &request)
         while (std::getline(databaseOfRequests, line))
         {
             std::istringstream iss(line);
-            std::string Cliente, Produto, Quantidade, Observação, Data, Hora;
+            std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
 
             if (std::getline(iss, Cliente, '|') &&
                 std::getline(iss, Produto, '|') &&
                 std::getline(iss, Quantidade, '|') &&
                 std::getline(iss, Observação, '|') &&
                 std::getline(iss, Data, '|') &&
-                std::getline(iss, Hora, '\n'))
+                std::getline(iss, Hora, '|') &&
+                std::getline(iss, Preco, '|') &&
+                std::getline(iss, Senha, '\n'))
             {
                 if (!(request.Cliente == Cliente &&
                       request.Data == Data &&
                       request.Hora == Hora &&
                       listObservação == Observação &&
                       listProduto == Produto &&
-                      listQuantidade == Quantidade))
+                      listQuantidade == Quantidade &&
+                      request.Preço == Preco))
                 {
-                    temporario << Cliente << "|"
-                               << Produto << "|"
-                               << Quantidade << "|"
-                               << Observação << "|"
-                               << Data << "|"
-                               << Hora << "\n";
+                    temporario << request.Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << Data << "|"
+                           << Hora << "|"
+                           << Preco << "|"
+                           << Senha << "\n";
                 }
                 else
                 {
@@ -297,7 +310,7 @@ void saveRequest(json jsonResponse)
     newRequest.Data = dataBuffer;
 
     char timeBuffer[10];
-    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", localTime);
+    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
     newRequest.Hora = timeBuffer;
 
     addRequest(newRequest);

@@ -3,11 +3,22 @@ struct product
     std::string Origem;
     std::string Descrição;
     std::string Foto;
-    std::string Prato;
+    std::string Produto;
     std::string Preço;
     std::string Quantidade;
     std::string Tempo;
 };
+
+// Função para imprimir os campos de um produto
+void printProduct(const product &prod) {
+    std::cout << "Origem: " << prod.Origem << std::endl;
+    std::cout << "Descrição: " << prod.Descrição << std::endl;
+    std::cout << "Foto: " << prod.Foto << std::endl;
+    std::cout << "Produto: " << prod.Produto << std::endl;
+    std::cout << "Preço: " << prod.Preço << std::endl;
+    std::cout << "Quantidade: " << prod.Quantidade << std::endl;
+    std::cout << "Tempo: " << prod.Tempo << std::endl;
+}
 
 std::string listofProducts;
 
@@ -16,7 +27,7 @@ void addProduct(const product &product)
     std::fstream databaseOfProducts("./database/products.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfProducts.is_open())
     {
-        databaseOfProducts << product.Origem << "|" << product.Descrição << "|" << product.Foto << "|" << product.Prato << "|"
+        databaseOfProducts << product.Origem << "|" << product.Descrição << "|" << product.Foto << "|" << product.Produto << "|"
                            << product.Preço << "|" << product.Quantidade << "|" << product.Tempo << "\n";
         databaseOfProducts.close();
     }
@@ -37,19 +48,19 @@ void listProducts()
         while (std::getline(databaseOfProducts, line))
         {
             std::istringstream iss(line);
-            std::string Origem, descricao, foto, name, preco, quantidade, tempo;
+            std::string origem, descricao, foto, produto, preco, quantidade, tempo;
 
-            if (std::getline(iss, Origem, '|') &&
+            if (std::getline(iss, origem, '|') &&
                 std::getline(iss, descricao, '|') &&
                 std::getline(iss, foto, '|') &&
-                std::getline(iss, name, '|') &&
+                std::getline(iss, produto, '|') &&
                 std::getline(iss, preco, '|') &&
                 std::getline(iss, quantidade, '|') &&
-                (std::getline(iss, tempo, '\n')||""))
+                std::getline(iss, tempo))
             {
                 json product;
-                product["Origem"] = Origem;
-                product["Product"] = name;
+                product["Origem"] = origem;
+                product["Produto"] = produto;
                 product["Descrição"] = descricao;
                 product["Foto"] = foto;
                 product["Preço"] = preco;
@@ -88,24 +99,26 @@ void dellProduct(const product &product)
         while (std::getline(databaseOfProducts, line))
         {
             std::istringstream iss(line);
-            std::string descricao, foto, name, preco, quantidade, tempo;
+            std::string origem, descricao, foto, produto, preco, quantidade, tempo;
 
-            if (std::getline(iss, descricao, '|') &&
+            if (std::getline(iss, origem, '|') &&
+                std::getline(iss, descricao, '|') &&
                 std::getline(iss, foto, '|') &&
-                std::getline(iss, name, '|') &&
+                std::getline(iss, produto, '|') &&
                 std::getline(iss, preco, '|') &&
                 std::getline(iss, quantidade, '|') &&
-                std::getline(iss, tempo, '\n'))
+                std::getline(iss, tempo))
             {
-                if (!(product.Descrição == descricao &&
-                      product.Foto == foto &&
-                      product.Prato == name &&
-                      product.Preço == preco &&
-                      product.Quantidade == quantidade &&
-                      product.Tempo == tempo))
+                if (!(product.Origem == origem &&
+                        product.Descrição == descricao &&
+                        product.Foto == foto &&
+                        product.Produto == produto &&
+                        product.Preço == preco &&
+                        product.Quantidade == quantidade &&
+                        product.Tempo == tempo))
                 {
-                    temporario << descricao << "|" << foto << "|"
-                               << name << "|" << preco << "|"
+                    temporario << origem << "|" << descricao << "|" << foto << "|"
+                               << produto << "|" << preco << "|"
                                << quantidade << "|" << tempo << "\n";
                 }
                 else
@@ -122,53 +135,56 @@ void dellProduct(const product &product)
 
         if (!encontrado)
         {
-            std::cout << "Prato não encontrado." << std::endl;
+            std::cout << "Produto não encontrado." << std::endl;
         }
     }
 }
 
 void editProduct(const product &oldProduct, const product &newProduct)
 {
-    std::fstream databaseOfProducts("./database/products.csv", std::ios::app | std::ios::in | std::ios::out);
+    std::fstream databaseOfProducts("./database/products.csv", std::ios::in | std::ios::out);
     if (databaseOfProducts.is_open())
     {
         std::fstream temporario("./database/temp.csv", std::ios::out);
-        if (!temporario)
+        if (!temporario.is_open())
         {
             std::cout << "Erro ao criar arquivo temporário." << std::endl;
             return;
         }
+        printProduct(oldProduct);
 
         bool encontrado = false;
         std::string line;
         while (std::getline(databaseOfProducts, line))
         {
             std::istringstream iss(line);
-            std::string descricao, foto, name, preco, quantidade, tempo;
+            std::string origem, descricao, foto, produto, preco, quantidade, tempo;
 
-            if (std::getline(iss, descricao, '|') &&
+            if (std::getline(iss, origem, '|') &&
+                std::getline(iss, descricao, '|') &&
                 std::getline(iss, foto, '|') &&
-                std::getline(iss, name, '|') &&
+                std::getline(iss, produto, '|') &&
                 std::getline(iss, preco, '|') &&
                 std::getline(iss, quantidade, '|') &&
-                std::getline(iss, tempo, '\n'))
+                std::getline(iss, tempo))
             {
-                if (oldProduct.Descrição == descricao &&
+                if (oldProduct.Origem == origem &&
+                    oldProduct.Descrição == descricao &&
                     oldProduct.Foto == foto &&
-                    oldProduct.Prato == name &&
+                    oldProduct.Produto == produto &&
                     oldProduct.Preço == preco &&
                     oldProduct.Quantidade == quantidade &&
                     oldProduct.Tempo == tempo)
                 {
-                    temporario << newProduct.Descrição << "|" << newProduct.Foto << "|"
-                               << newProduct.Prato << "|" << newProduct.Preço << "|"
+                    temporario << newProduct.Origem << "|" << newProduct.Descrição << "|" << newProduct.Foto << "|"
+                               << newProduct.Produto << "|" << newProduct.Preço << "|"
                                << newProduct.Quantidade << "|" << newProduct.Tempo << "\n";
                     encontrado = true;
                 }
                 else
                 {
-                    temporario << descricao << "|" << foto << "|"
-                               << name << "|" << preco << "|"
+                    temporario << origem << "|" << descricao << "|" << foto << "|"
+                               << produto << "|" << preco << "|"
                                << quantidade << "|" << tempo << "\n";
                 }
             }
@@ -181,7 +197,7 @@ void editProduct(const product &oldProduct, const product &newProduct)
 
         if (!encontrado)
         {
-            std::cout << "Prato não encontrado para edição." << std::endl;
+            std::cout << "Produto não encontrado para edição." << std::endl;
         }
     }
 }
@@ -203,7 +219,7 @@ product productMap(json jsonResponse, std::string premissa)
     }
     if (jsonResponse.contains(premissa + "Produto"))
     {
-        product.Prato = jsonResponse[premissa + "Produto"];
+        product.Produto = jsonResponse[premissa + "Produto"];
     }
     if (jsonResponse.contains(premissa + "Preço"))
     {
