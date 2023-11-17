@@ -199,7 +199,7 @@ void updateClient(json jsonResponse)
     oldClient.Nome = jsonResponse["old_Nome"];
     oldClient.Email = jsonResponse["old_Email"];
     oldClient.Numero = jsonResponse["old_Numero"];
-    oldClient.Classificacao = jsonResponse["Classificação"];
+    oldClient.Classificacao = jsonResponse["old_Classificação"];
 
     client newClient;
     newClient.Nome = jsonResponse["Nome"];

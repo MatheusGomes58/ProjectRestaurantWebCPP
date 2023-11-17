@@ -5,10 +5,10 @@
 
 void loadHtmlFileIntoString(const std::string &filename, std::string &targetString)
 {
-    listRequests();
     listProducts();
     listClients();
     listHistorys();
+    listRequests();
 
     std::ifstream file(filename, std::ios::in | std::ios::binary);
 

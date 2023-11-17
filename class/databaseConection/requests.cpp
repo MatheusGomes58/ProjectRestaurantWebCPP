@@ -35,9 +35,13 @@ struct request
     std::string Hora;
     std::string Preco;
     std::string Senha;
+    std::string Atendimento;
 };
 
 std::string listofRequests;
+int programSenha = 0;
+int atualSenha = 0;
+int tamanhoDaFila = 1;
 
 void addRequest(const request &request)
 {
@@ -56,8 +60,8 @@ void addRequest(const request &request)
                            << request.Data << "|"
                            << request.Hora << "|"
                            << request.Preco << "|"
-                           << request.Senha << "\n";
-
+                           << request.Senha << "|"
+                           << request.Atendimento << "\n";
         databaseOfRequests.close();
     }
     else
@@ -69,8 +73,10 @@ void addRequest(const request &request)
 
 void listRequests()
 {
+    
     std::fstream databaseOfRequests("./database/requests.csv");
     listofRequests = "";
+    atualSenha = programSenha;
 
     if (databaseOfRequests.is_open())
     {
@@ -78,30 +84,33 @@ void listRequests()
         while (std::getline(databaseOfRequests, line))
         {
             std::istringstream iss(line);
-            std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
+            request request;
+            std::string Produto, Quantidade, Observação;
 
-            if (std::getline(iss, Cliente, '|') &&
+            if (std::getline(iss, request.Cliente, '|') &&
                 std::getline(iss, Produto, '|') &&
                 std::getline(iss, Quantidade, '|') &&
                 std::getline(iss, Observação, '|') &&
-                std::getline(iss, Data, '|') &&
-                std::getline(iss, Hora, '|') &&
-                std::getline(iss, Preco, '|') &&
-                std::getline(iss, Senha, '\n'))
+                std::getline(iss, request.Data, '|') &&
+                std::getline(iss, request.Hora, '|') &&
+                std::getline(iss, request.Preco, '|') &&
+                std::getline(iss, request.Senha, '|') &&
+                std::getline(iss, request.Atendimento, '\n'))
             {
                 // Criar um objeto JSON para representar a solicitação
                 json requestJson;
-                requestJson["Cliente"] = Cliente;
-                requestJson["Data"] = Data;
-                requestJson["Hora"] = Hora;
-                std::vector<std::string> products = splitString(Produto, ';');
-                std::vector<std::string> quantities = splitString(Quantidade, ';');
-                std::vector<std::string> observations = splitString(Observação, ';');
-                requestJson["Produto"] = products;
-                requestJson["Quantidade"] = quantities;
-                requestJson["Observação"] = observations;
-                requestJson["Preço"] = Preco;
-                requestJson["Senha"] = Senha;
+                requestJson["Cliente"] = request.Cliente;
+                requestJson["Data"] = request.Data;
+                requestJson["Hora"] = request.Hora;
+                request.Produto = splitString(Produto, ';');
+                request.Quantidade = splitString(Quantidade, ';');
+                request.Observação = splitString(Observação, ';');
+                requestJson["Produto"] = request.Produto;
+                requestJson["Quantidade"] = request.Quantidade;
+                requestJson["Observação"] = request.Observação;
+                requestJson["Preço"] = request.Preco;
+                requestJson["Senha"] = request.Senha;
+                requestJson["Atendimento"] = request.Atendimento;
                 requestJson["Origem"] = "request";
 
                 // Converter o objeto JSON em uma string e adicionar à lista
@@ -110,15 +119,21 @@ void listRequests()
                     listofRequests += ",";
                 }
                 listofRequests += requestJson.dump();
+
+                int senhaAtualValue = std::stoi(request.Senha);
+                inserirNaFila(umaFila, senhaAtualValue);
+                if (senhaAtualValue < atualSenha) {
+                    atualSenha = senhaAtualValue;
+                }
+                tamanhoDaFila++;
             }
         }
-
         databaseOfRequests.close();
     }
     return;
 }
 
-void dellRequest(const request &request)
+void dellRequest(const request &inputRequest)
 {
     std::fstream databaseOfRequests("./database/requests.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfRequests.is_open())
@@ -131,43 +146,47 @@ void dellRequest(const request &request)
         }
 
         std::string listProduto, listQuantidade, listObservação;
-        listProduto = createStringList(request.Produto);
-        listQuantidade = createStringList(request.Quantidade);
-        listObservação = createStringList(request.Observação);
+        listProduto = createStringList(inputRequest.Produto);
+        listQuantidade = createStringList(inputRequest.Quantidade);
+        listObservação = createStringList(inputRequest.Observação);
 
         bool encontrado = false;
         std::string line;
         while (std::getline(databaseOfRequests, line))
         {
             std::istringstream iss(line);
-            std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
+            request consulrequest; 
+            std::string Produto, Quantidade, Observação;
 
-            if (std::getline(iss, Cliente, '|') &&
+            if (std::getline(iss, consulrequest.Cliente, '|') &&
                 std::getline(iss, Produto, '|') &&
                 std::getline(iss, Quantidade, '|') &&
                 std::getline(iss, Observação, '|') &&
-                std::getline(iss, Data, '|') &&
-                std::getline(iss, Hora, '|') &&
-                std::getline(iss, Preco, '|') &&
-                std::getline(iss, Senha, '\n'))
+                std::getline(iss, consulrequest.Data, '|') &&
+                std::getline(iss, consulrequest.Hora, '|') &&
+                std::getline(iss, consulrequest.Preco, '|') &&
+                std::getline(iss, consulrequest.Senha, '|') &&
+                std::getline(iss, consulrequest.Atendimento, '\n'))
             {
-                if (!(request.Cliente == Cliente &&
-                      request.Data == Data &&
-                      request.Hora == Hora &&
+                if (!(inputRequest.Cliente == consulrequest.Cliente &&
+                      inputRequest.Data == consulrequest.Data &&
+                      inputRequest.Hora == consulrequest.Hora &&
                       listObservação == Observação &&
                       listProduto == Produto &&
                       listQuantidade == Quantidade &&
-                      request.Preco == Preco &&
-                      request.Senha == Senha))
+                      inputRequest.Preco == consulrequest.Preco &&
+                      inputRequest.Senha == consulrequest.Senha &&
+                      inputRequest.Atendimento == consulrequest.Atendimento))
                 {
-                    temporario << request.Cliente << "|"
-                               << Produto << "|"
-                               << Quantidade << "|"
-                               << Observação << "|"
-                               << Data << "|"
-                               << Hora << "|"
-                               << Preco << "|"
-                               << Senha << "\n";
+                    temporario << consulrequest.Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << consulrequest.Data << "|"
+                           << consulrequest.Hora << "|"
+                           << consulrequest.Preco << "|"
+                           << consulrequest.Senha << "|"
+                           << consulrequest.Atendimento << "\n";
                 }
                 else
                 {
@@ -218,48 +237,53 @@ void editRequest(const request &oldRequest, const request &newRequest)
     while (std::getline(databaseOfRequests, line))
     {
         std::istringstream iss(line);
-        std::string Cliente, Produto, Quantidade, Observação, Data, Hora, Preco, Senha;
+        request consulrequest;
+            std::string Produto, Quantidade, Observação;
 
-        if (std::getline(iss, Cliente, '|') &&
-            std::getline(iss, Produto, '|') &&
-            std::getline(iss, Quantidade, '|') &&
-            std::getline(iss, Observação, '|') &&
-            std::getline(iss, Data, '|') &&
-            std::getline(iss, Hora, '|') &&
-            std::getline(iss, Preco, '|') &&
-            std::getline(iss, Senha, '\n'))
-        {
-            if (oldRequest.Cliente == Cliente &&
-                oldRequest.Data == Data &&
-                oldRequest.Hora == Hora &&
-                listObservação == Observação &&
-                listProduto == Produto &&
-                listQuantidade == Quantidade &&
-                oldRequest.Preco == Preco &&
-                oldRequest.Senha == Senha)
+            if (std::getline(iss, consulrequest.Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, consulrequest.Data, '|') &&
+                std::getline(iss, consulrequest.Hora, '|') &&
+                std::getline(iss, consulrequest.Preco, '|') &&
+                std::getline(iss, consulrequest.Senha, '|') &&
+                std::getline(iss, consulrequest.Atendimento, '\n'))
             {
-                encontrado = true;
-                temporario << newRequest.Cliente << "|"
-                           << novoProduto << "|"
-                           << novaQuantidade << "|"
-                           << novaObservação << "|"
-                           << oldRequest.Data << "|"
-                           << oldRequest.Hora << "|"
-                           << newRequest.Preco << "|"
-                           << Senha << "\n";
-            }
-            else
-            {
-                temporario << Cliente << "|"
+                if (!(oldRequest.Cliente == consulrequest.Cliente &&
+                      oldRequest.Data == consulrequest.Data &&
+                      oldRequest.Hora == consulrequest.Hora &&
+                      listObservação == Observação &&
+                      listProduto == Produto &&
+                      listQuantidade == Quantidade &&
+                      oldRequest.Preco == consulrequest.Preco &&
+                      oldRequest.Senha == consulrequest.Senha &&
+                      oldRequest.Atendimento == consulrequest.Atendimento))
+                {
+                    temporario << consulrequest.Cliente << "|"
                            << Produto << "|"
                            << Quantidade << "|"
                            << Observação << "|"
-                           << Data << "|"
-                           << Hora << "|"
-                           << Preco << "|"
-                           << Senha << "\n";
-            }
-        }
+                           << consulrequest.Data << "|"
+                           << consulrequest.Hora << "|"
+                           << consulrequest.Preco << "|"
+                           << consulrequest.Senha << "|"
+                           << consulrequest.Atendimento << "\n";
+                }
+                else
+                {
+                    encontrado = true;
+                    temporario << newRequest.Cliente << "|"
+                           << novoProduto << "|"
+                           << novaQuantidade << "|"
+                           << novaObservação << "|"
+                           << newRequest.Data << "|"
+                           << newRequest.Hora << "|"
+                           << newRequest.Preco << "|"
+                           << consulrequest.Senha << "|"
+                           << newRequest.Atendimento << "\n";
+                }
+    }
     }
 
     databaseOfRequests.close();
@@ -274,6 +298,68 @@ void editRequest(const request &oldRequest, const request &newRequest)
     {
         remove("./database/requests.csv");                        // Remove o arquivo original.
         rename("./database/temp.csv", "./database/requests.csv"); // Renomeia o arquivo temporário.
+    }
+}
+
+void callRequest(std::string senhaChamada)
+{
+    std::fstream databaseOfRequests("./database/requests.csv", std::ios::app | std::ios::in | std::ios::out);
+    if (databaseOfRequests.is_open())
+    {
+        std::fstream temporario("./database/temp.csv", std::ios::out);
+        if (!temporario)
+        {
+            std::cout << "Erro ao criar arquivo temporário." << std::endl;
+            return;
+        }
+
+        bool encontrado = false;
+        std::string line;
+        while (std::getline(databaseOfRequests, line))
+        {
+            std::istringstream iss(line);
+            request consulrequest; 
+            std::string Produto, Quantidade, Observação;
+
+            if (std::getline(iss, consulrequest.Cliente, '|') &&
+                std::getline(iss, Produto, '|') &&
+                std::getline(iss, Quantidade, '|') &&
+                std::getline(iss, Observação, '|') &&
+                std::getline(iss, consulrequest.Data, '|') &&
+                std::getline(iss, consulrequest.Hora, '|') &&
+                std::getline(iss, consulrequest.Preco, '|') &&
+                std::getline(iss, consulrequest.Senha, '|') &&
+                std::getline(iss, consulrequest.Atendimento, '\n'))
+            {
+
+                if (!(consulrequest.Senha == senhaChamada))
+                {
+                    temporario << consulrequest.Cliente << "|"
+                           << Produto << "|"
+                           << Quantidade << "|"
+                           << Observação << "|"
+                           << consulrequest.Data << "|"
+                           << consulrequest.Hora << "|"
+                           << consulrequest.Preco << "|"
+                           << consulrequest.Senha << "|"
+                           << consulrequest.Atendimento << "\n";
+                }
+                else
+                {
+                    encontrado = true;
+                }
+            }
+        }
+
+        temporario.close();
+        databaseOfRequests.close();
+        remove("./database/requests.csv");
+        rename("./database/temp.csv", "./database/requests.csv");
+
+        if (!encontrado)
+        {
+            std::cout << "Pedido não encontrado." << std::endl;
+        }
     }
 }
 
@@ -312,6 +398,10 @@ request requestMap(json jsonResponse, std::string premissa)
     {
         request.Senha = jsonResponse[premissa + "Senha"];
     }
+    if (jsonResponse.contains(premissa + "Atendimento"))
+    {
+        request.Atendimento = jsonResponse[premissa + "Atendimento"];
+    }
     return request;
 }
 
@@ -329,6 +419,8 @@ void saveRequest(json jsonResponse)
     strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
     newRequest.Hora = timeBuffer;
 
+    newRequest.Senha = std::to_string(programSenha + 1);
+
     addRequest(newRequest);
     return;
 }
@@ -344,6 +436,33 @@ void updateRequest(json jsonResponse)
 {
     request oldRequest = requestMap(jsonResponse, "old_");
     request UpdateRequest = requestMap(jsonResponse, "");
+
+    time_t now = time(0);
+    tm *localTime = localtime(&now);
+    char dataBuffer[11];
+    strftime(dataBuffer, sizeof(dataBuffer), "%d/%m/%Y", localTime);
+    UpdateRequest.Data = dataBuffer;
+
+    char timeBuffer[10];
+    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
+    UpdateRequest.Hora = timeBuffer;
+
     editRequest(oldRequest, UpdateRequest);
     return;
+}
+
+void callPass(){
+        mostrarFila(umaFila);
+    if (estaVazia(umaFila)) {
+        mostrarFila(umaFila);
+        int atualSenhavalue = removerDaFila(umaFila);
+
+        // Converta o número para uma string usando stringstream
+        std::ostringstream convert;
+        convert << atualSenhavalue;
+        std::string atualSenhaStr = convert.str();
+
+        // Passe a string como parâmetro para a função callRequest
+        callRequest(atualSenhaStr);
+    }
 }

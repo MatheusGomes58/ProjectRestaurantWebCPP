@@ -20,7 +20,7 @@ void processJson(json jsonResponse)
         else if (type == "requestUpdate")
         {
             updateRequest(jsonResponse);
-            updateHistory(jsonResponse);
+            saveHistory(jsonResponse);
         }
         else if (type == "products")
         {
@@ -46,6 +46,10 @@ void processJson(json jsonResponse)
         {
             updateClient(jsonResponse);
         }
+        else if (type == "callPass")
+        {
+            callPass();
+        }
         else
         {
             std::cout << "tipo de processo desconhecido" << std::endl;
@@ -60,6 +64,7 @@ int main()
 
     while (true)
     {
+        criarFila(umaFila);
         int client_fd;
         struct sockaddr_in cli_addr;
         socklen_t sin_len = sizeof(cli_addr);
@@ -99,5 +104,6 @@ int main()
     }
 
     close(sock);
+    delete[] umaFila.dados;
     return 0;
 }

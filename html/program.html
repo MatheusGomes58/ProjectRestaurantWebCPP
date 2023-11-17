@@ -35,6 +35,9 @@
                         <a class="nav-link" aria-current="page" onclick="toggleSection('menu')">Menu</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" aria-current="page" onclick="toggleSection('espera')">Sala de Espera</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" onclick="toggleSection('history')">Histórico</a>
                     </li>
                     <li class="nav-item dropdown">
@@ -83,6 +86,8 @@
         </div>
         <script>
             function openModal(modal) {
+                var cliente = document.getElementById("Cliente").value;
+                exibirAtendimento(cliente)
                 var modal = document.getElementById(modal);
                 modal.style.display = 'block';
             }
@@ -125,7 +130,7 @@
             </div>
             <div style="width: 100%; height: auto; background-color: aliceblue;">
                 <div class="container">
-                    <h3 class="text-center mt-5">Produtos</h3>
+                    <h3 class="text-center mt-5">Pratos</h3>
                 </div>
                 <div class="row mt-4" id="platesList" style="justify-content: center;"></div>
             </div>
@@ -140,6 +145,24 @@
                     <h3 class="text-center mt-5">Sobremesas</h3>
                 </div>
                 <div class="row mt-4" id="dessertList" style="justify-content: center;"></div>
+            </div>
+        </section>
+        <section id="espera" class="sections">
+            <div class="row" style="display: flex; align-items: center; justify-content: center;">
+                <div class="card col-10" style="
+                    margin: 3%; 
+                    padding: 5%; 
+                    height: 300px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: aliceblue;">
+                    <h1 class="h1" style="font-size: 180px;" id="senhaChamada">000</h3>
+                        <button class="btn btn-outline-secondary" onclick="callItem()">Chamar o Próximo</button>
+                </div>
+                <div class="card col-6" style="margin: 3%; 
+                    height: 300px; padding: 1%; overflow-y: auto;" id="tableOfPass">    
+                </div>
             </div>
         </section>
         <section id="history" class="sections">
@@ -178,9 +201,20 @@
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="Cliente">Cliente:</label>
-                    <select class="form-control" id="Cliente" name="Cliente" required>
-                    </select>
+                    <div class="row">
+                        <label for="Cliente" class="col">Cliente:</label>
+                        <label for="Cliente" class="col">Atendimento:</label>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <select class="form-control" id="Cliente" name="Cliente"
+                                onchange="exibirAtendimento(this.value)" required>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <input type="text" id="atendimento" class="form-control" placeholder="Atendimento" readonly>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;" id="Produto">
@@ -204,7 +238,7 @@
                             </div>
                             <div class="col-1" id="ExcluirAqui" style="display: none;"></div>
                             <label id="Valor0" class="col-1" style="display: flex; justify-content: end;">R$
-                                0,00</label>
+                                0.00</label>
                         </div>
                     </div>
                 </div>
@@ -212,7 +246,7 @@
                 <div class="form-group" style="margin-top: 1%;">
                     <div class="row">
                         <label class="col" style="display: flex; justify-content: end;">Total:</label>
-                        <label id="ValorTotal" class="col-1">R$ 0,00</label>
+                        <label id="ValorTotal" class="col-1">R$ 0.00</label>
                     </div>
                 </div>
 
@@ -236,6 +270,7 @@
                     var index_request = document.getElementById('index_request').value;
                     var Cliente = document.getElementById('Cliente').value;
                     var Observação = document.getElementById('Observação').value;
+                    var Atendimento = document.getElementById('atendimento').value;
                     var valorTotal = document.getElementById('ValorTotal').textContent.replace("R$ ", "");
 
                     // Dividir a Observação em uma lista usando a quebra de linha
@@ -249,7 +284,7 @@
                     var Quantidade = Array.from(quantityInputs).map(input => input.value.trim().toString());
 
                     // Validar se todos os campos estão preenchidos
-                    if (!Cliente || !valorTotal || Produto.length === 0 || Quantidade.length === 0
+                    if (!Cliente || valorTotal === "R$ 0.00" || Produto.length === 0 || Quantidade.length === 0
                         || Produto[0] === "" || Quantidade[0] === "") {
                         alert("Por favor, preencha todos os campos.");
                         return; // Impede a continuação da execução da função se houver campos vazios.
@@ -267,6 +302,7 @@
                             Observação: ObservaçãoLista,
                             Preço: valorTotal,
                             Senha: "",
+                            Atendimento: Atendimento
                         };
                     } else {
                         var item = listOfJson[index_request];
@@ -280,12 +316,14 @@
                             old_Data: item.Data,
                             old_Senha: item.Senha,
                             old_Preço: item.Preço,
+                            old_Atendimento: item.Atendimento,
 
                             Cliente: Cliente,
                             Produto: Produto,
                             Quantidade: Quantidade,
                             Observação: ObservaçãoLista, // Enviar Observação como uma lista
                             Preço: valorTotal,
+                            Atendimento: Atendimento
                         };
                     }
                     sendJsonToBack(jsonData);
@@ -332,7 +370,7 @@
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
-                    <label for="Preferencial">Classificação de Cliente:</label>
+                    <label for="Preferencial">Atendimento:</label>
                     <select class="form-control" name="Preferencial" id="Preferencial" required>
                         <option>Preferencial</option>
                         <option>Comum</option>
@@ -376,7 +414,7 @@
                             old_Nome: item.Nome,
                             old_Email: item.Email,
                             old_Numero: item.Numero,
-                            Classificação: item.Classificação,
+                            old_Classificação: item.Classificação,
 
                             Nome: nameCliente,
                             Email: emailCliente,
@@ -475,7 +513,10 @@
                     const precoProduto = document.getElementById('Preço').value.toString();
                     const tempoPreparo = document.getElementById('Tempo').value.toString();
                     const quantidadeDisponivel = document.getElementById('QuantidadeProduto').value.toString();
-                    console.log(quantidadeDisponivel)
+
+                    // Dividir a Observação em uma lista usando a quebra de linha
+                    var ObservaçãoLista = descricaoProduto.split('\n').map(item => item.trim());
+
 
                     // Validar se todos os campos estão preenchidos
                     if (!index_Produto && !nameProduto && !fotoProduto &&
@@ -493,7 +534,7 @@
                             Produto: nameProduto,
                             Quantidade: quantidadeDisponivel,
                             Foto: fotoProduto,
-                            Descrição: descricaoProduto,
+                            Descrição: ObservaçãoLista,
                             Preço: precoProduto,
                             Tempo: tempoPreparo
                         };
@@ -513,7 +554,7 @@
                             Quantidade: quantidadeDisponivel,
                             Produto: nameProduto,
                             Foto: fotoProduto,
-                            Descrição: descricaoProduto,
+                            Descrição: ObservaçãoLista,
                             Preço: precoProduto,
                             Tempo: tempoPreparo
                         };
@@ -549,6 +590,7 @@
         function preparateJsonList(dateList) {
             if (dateList) {
                 var dateJSON = dateList;
+
                 if (dateList.indexOf("},{") !== -1) {
                     dateJSON = dateList.split("},{");
                     dateJSON = dateJSON.map(function (item, index) {
@@ -560,24 +602,52 @@
                             return "{" + item + "}";
                         }
                     });
-                    var dateList = dateJSON.map(function (item) {
-                        return JSON.parse(item);
-                    });
-                } else {
-                    if (!Array.isArray(dateList)) {
-                        dateJSON = [JSON.parse(dateList)];
-                    }
 
-                    return dateJSON;
+                    dateJSON = dateJSON.map(function (item) {
+                        try {
+                            // Tenta fazer o parse do JSON
+                            return JSON.parse(item);
+                        } catch (error) {
+                            // Se falhar, retorna um objeto vazio
+                            return {};
+                        }
+                    });
+
+                } else {
+                    try {
+                        if (!Array.isArray(dateList)) {
+                            dateJSON = [JSON.parse(dateList)];
+                        }
+                    } catch (error) {
+                        // Se falhar, retorna um array vazio
+                        return [];
+                    }
                 }
+
+                // Remove objetos vazios do array
+                dateJSON = dateJSON.filter(function (item) {
+                    return Object.keys(item).length > 0;
+                });
+
+                // Ordena o array por "Data" e "Hora" se os campos existirem
+                if (dateJSON.length > 0 && 'Data' in dateJSON[0] && 'Hora' in dateJSON[0]) {
+                    dateJSON.sort(function (b, a) {
+                        var dateComparison = a.Data.localeCompare(b.Data);
+                        return dateComparison !== 0 ? dateComparison : a.Hora.localeCompare(b.Hora);
+                    });
+                }
+
+                return dateJSON;
             }
 
-            return dateList
+            return dateList;
         }
+
 
         function renderRequests(dateList) {
             if (dateList && dateList.length > 0) {
                 document.getElementById("updatePedidos").innerHTML = renderTable(dateList, true);
+                document.getElementById("tableOfPass").innerHTML = renderTable(dateList, false, true);
             }
         }
 
@@ -624,19 +694,21 @@
             return optionlist;
         }
 
-        function renderTable(dateList, edit) {
+        function renderTable(dateList, edit, passwordList) {
             dateList = preparateJsonList(dateList);
 
             // Defina a ordem desejada das colunas
             var columnOrder;
             if (dateList[0].Origem == "history") {
-                columnOrder = ['Senha', 'Data', 'Hora', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
+                columnOrder = ['Data', 'Hora', 'Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
             } if (dateList[0].Origem == 'request') {
-                columnOrder = ['Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço'];
+                columnOrder = ['Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço', 'Atendimento'];
             } if (dateList[0].Origem == 'client') {
                 columnOrder = ['Nome', 'Email', 'Numero', 'Classificação'];
             } if (dateList[0].Origem == 'plates' || dateList[0].Origem == 'drinks' || dateList[0].Origem == 'dessert') {
-                columnOrder = ['Produto', 'Descrição', 'Quantidade', 'Preço', 'Tempo'];
+                columnOrder = ['Origem', 'Produto', 'Descrição', 'Quantidade', 'Preço', 'Tempo'];
+            } if (passwordList) {
+                columnOrder = ['Senha', 'Cliente', 'Atendimento'];
             }
 
             // Itere sobre o array de ordem para construir as colunas
@@ -693,9 +765,9 @@
                 var ProdutosList = "";
                 ProdutosList += `
                     <div class="col-md-3" style="margin:2%;">
-                        <div class="card">`
+                        <div class="card" style="display:flex; justify-content:center; align-items: center; padding:1%;">`
                 if (dateList[i]["Foto"]) {
-                    ProdutosList += `<img src="${dateList[i]["Foto"]}" class="card-img-top" alt="${dateList[i]["Foto"]}">`
+                    ProdutosList += `<img src="${dateList[i]["Foto"]}" class="card-img-top" style="width:280px; height: auto;">`
                 }
                 ProdutosList += `<div class="card-body">`
                 if (dateList[i]["Produto"]) {
@@ -760,7 +832,19 @@
 
         function deleteItem(index) {
             var jsonData = listOfJson[index];
-            jsonData.type = jsonData.Origem + "Delete";
+            if (jsonData.Origem == "plates" || jsonData.Origem == "drinks" || jsonData.Origem == "dessert") {
+                jsonData.type = "productDelete";
+            } else {
+                jsonData.type = jsonData.Origem + "Delete";
+            }
+            if (jsonData) {
+                sendJsonToBack(jsonData);
+            }
+        }
+
+        function callItem(index) {
+            var jsonData = {};
+            jsonData.type = "callPass";
             if (jsonData) {
                 sendJsonToBack(jsonData);
             }
@@ -863,6 +947,18 @@
             }
         }
 
+        function exibirAtendimento(cliente) {
+            var atendimento;
+            // Encontrar o valor correspondente na lista de JSONs
+            for (var i = 0; i < listOfJson.length; i++) {
+                if (listOfJson[i].Nome === cliente) {
+                    atendimento = listOfJson[i].Classificação;
+                    break; // Sair do loop assim que encontrar o valor correspondente
+                }
+            }
+            document.getElementById("atendimento").value = atendimento;
+        }
+
         function exibirValor(index) {
             var selectElement = document.getElementById("Produto_example_select" + index).value;
             var quantidadeElement = document.getElementById("Quantidade_Produto" + index).value;
@@ -877,11 +973,20 @@
             }
 
             // Calcular o valor total
-            var valorTotal = parseFloat(valorAtual) * parseFloat(quantidadeElement);
+            var valorTotal = parseFloat(valorAtual) * parseInt(quantidadeElement);
+
+            // Verifica se valorTotal é um número antes de usar toFixed
+            if (!isNaN(valorTotal)) {
+                // Se for um número, formata com toFixed
+                valorTotal = valorTotal.toFixed(2);
+            } else {
+                // Se não for um número, atribui '0.00' ou qualquer valor padrão desejado
+                valorTotal = '0.00';
+            }
 
             // Exibir o valor total na label com 2 casas decimais
             var labelElement = document.getElementById("Valor" + index);
-            labelElement.innerHTML = "R$ " + valorTotal.toFixed(2);
+            labelElement.innerHTML = "R$ " + valorTotal;
 
             // Atualizar a label valortotal
             atualizarValorTotal();
@@ -899,9 +1004,18 @@
                 valorTotal += parseFloat(valorStr);
             }
 
+            // Verifica se valorTotal é um número antes de usar toFixed
+            if (!isNaN(valorTotal)) {
+                // Se for um número, formata com toFixed
+                valorTotal = valorTotal.toFixed(2);
+            } else {
+                // Se não for um número, atribui '0.00' ou qualquer valor padrão desejado
+                valorTotal = '0.00';
+            }
+
             // Atualiza a label valortotal
             var valortotalElement = document.getElementById("ValorTotal");
-            valortotalElement.innerHTML = "R$ " + valorTotal.toFixed(2);
+            valortotalElement.innerHTML = "R$ " + valorTotal;
         }
 
         toggleSection('menu')

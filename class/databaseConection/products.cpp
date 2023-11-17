@@ -1,7 +1,7 @@
 struct product
 {
     std::string Origem;
-    std::string Descrição;
+    std::vector<std::string> Descrição;
     std::string Foto;
     std::string Produto;
     std::string Preço;
@@ -13,10 +13,11 @@ std::string listofProducts;
 
 void addProduct(const product &product)
 {
+    std::string descricao = createStringList(product.Descrição);
     std::fstream databaseOfProducts("./database/products.csv", std::ios::app | std::ios::in | std::ios::out);
     if (databaseOfProducts.is_open())
     {
-        databaseOfProducts << product.Origem << "|" << product.Descrição << "|" << product.Foto << "|" << product.Produto << "|"
+        databaseOfProducts << product.Origem << "|" << descricao << "|" << product.Foto << "|" << product.Produto << "|"
                            << product.Preço << "|" << product.Quantidade << "|" << product.Tempo << "\n";
         databaseOfProducts.close();
     }
@@ -50,7 +51,8 @@ void listProducts()
                 json product;
                 product["Origem"] = origem;
                 product["Produto"] = produto;
-                product["Descrição"] = descricao;
+                std::vector<std::string> description = splitString(descricao, ';');
+                product["Descrição"] = description;
                 product["Foto"] = foto;
                 product["Preço"] = preco;
                 product["Quantidade"] = quantidade;
@@ -89,6 +91,7 @@ void dellProduct(const product &product)
         {
             std::istringstream iss(line);
             std::string origem, descricao, foto, produto, preco, quantidade, tempo;
+            std::string description = createStringList(product.Descrição);
 
             if (std::getline(iss, origem, '|') &&
                 std::getline(iss, descricao, '|') &&
@@ -99,7 +102,7 @@ void dellProduct(const product &product)
                 std::getline(iss, tempo))
             {
                 if (!(product.Origem == origem &&
-                        product.Descrição == descricao &&
+                        description == descricao &&
                         product.Foto == foto &&
                         product.Produto == produto &&
                         product.Preço == preco &&
@@ -147,6 +150,8 @@ void editProduct(const product &oldProduct, const product &newProduct)
         {
             std::istringstream iss(line);
             std::string origem, descricao, foto, produto, preco, quantidade, tempo;
+            std::string description = createStringList(oldProduct.Descrição);
+            std::string descriptionnew = createStringList(newProduct.Descrição);
 
             if (std::getline(iss, origem, '|') &&
                 std::getline(iss, descricao, '|') &&
@@ -157,14 +162,14 @@ void editProduct(const product &oldProduct, const product &newProduct)
                 std::getline(iss, tempo))
             {
                 if (oldProduct.Origem == origem &&
-                    oldProduct.Descrição == descricao &&
+                    description == descricao &&
                     oldProduct.Foto == foto &&
                     oldProduct.Produto == produto &&
                     oldProduct.Preço == preco &&
                     oldProduct.Quantidade == quantidade &&
                     oldProduct.Tempo == tempo)
                 {
-                    temporario << newProduct.Origem << "|" << newProduct.Descrição << "|" << newProduct.Foto << "|"
+                    temporario << newProduct.Origem << "|" << descriptionnew << "|" << newProduct.Foto << "|"
                                << newProduct.Produto << "|" << newProduct.Preço << "|"
                                << newProduct.Quantidade << "|" << newProduct.Tempo << "\n";
                     encontrado = true;
