@@ -39,6 +39,7 @@ struct request
 };
 
 std::string listofRequests;
+std::string senhaChamada;
 int programSenha = 0;
 int atualSenha = 0;
 int tamanhoDaFila = 1;
@@ -452,16 +453,45 @@ void updateRequest(json jsonResponse)
     return;
 }
 
+void salvarSenhaChamada(const std::string &senha)
+{
+    std::fstream databaseOfPassword("./database/senhaChamada.csv", std::ios::app | std::ios::in | std::ios::out);
+    if (databaseOfPassword.is_open())
+    {
+        databaseOfPassword << senha;
+        databaseOfPassword.close();
+    }
+    else
+    {
+        std::cerr << "Erro ao abrir o arquivo para salvar a senha chamada.\n";
+    }
+}
+
+void lerSenhaChamada()
+{
+    std::fstream databaseOfPassword("./database/senhaChamada.csv");
+    if (databaseOfPassword.is_open())
+    {
+        std::getline(databaseOfPassword, senhaChamada);
+        databaseOfPassword.close();
+    }
+    else
+    {
+        std::cerr << "Erro ao abrir o arquivo para ler a senha chamada.\n";
+    }
+}
+
 void callPass(Fila &f)
 {
-    if (estaVazia(f))
+    if (!estaVazia(f))
     {
-        int atualSenhavalue = removerDaFila(f);
+        int senhaChamadaValue = removerDaFila(f);
 
-        // Converta o número para uma string usando stringstream
         std::ostringstream convert;
-        convert << atualSenhavalue;
+        convert << senhaChamadaValue;
         std::string atualSenhaStr = convert.str();
+
+        salvarSenhaChamada(atualSenhaStr);
 
         // Passe a string como parâmetro para a função callRequest
         callRequest(atualSenhaStr);

@@ -9,6 +9,7 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
     listClients();
     listHistorys();
     listRequests(f);
+    lerSenhaChamada();
 
     std::ifstream file(filename, std::ios::in | std::ios::binary);
 
@@ -31,6 +32,7 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         targetString.append("<script>renderProducts('" + listofProducts + "')</script>");
         targetString.append("<script>renderUsers('" + listofClients + "')</script>");
         targetString.append("<script>renderHistory('" + listofHistorys + "')</script>");
+        targetString.append("<script>renderPassword('" + senhaChamada + "')</script>");
         if (!(listofClients.length() > 0 && listofProducts.length() > 0))
         {
             targetString.append("<script>disableRequest()</script>");

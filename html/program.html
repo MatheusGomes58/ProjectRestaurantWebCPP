@@ -672,6 +672,10 @@
             }
         }
 
+        function renderPassword(value){
+            document.getElementById("senhaChamada").innerHTML = value;
+        }
+
         function disableRequest(valor1, valor2) {
             if (!(valor1 || valor2)) {
                 document.getElementById("requestSave").style.display = "none";
