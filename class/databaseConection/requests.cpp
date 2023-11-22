@@ -455,9 +455,10 @@ void updateRequest(json jsonResponse)
 
 void salvarSenhaChamada(const std::string &senha)
 {
-    std::fstream databaseOfPassword("./database/senhaChamada.csv", std::ios::app | std::ios::in | std::ios::out);
+    std::fstream databaseOfPassword("./database/senhaChamada.csv", std::ios::in | std::ios::out);
     if (databaseOfPassword.is_open())
     {
+        databaseOfPassword.clear();
         databaseOfPassword << senha;
         databaseOfPassword.close();
     }
@@ -483,7 +484,7 @@ void lerSenhaChamada()
 
 void callPass(Fila &f)
 {
-    if (!estaVazia(f))
+    if (estaVazia(f))
     {
         int senhaChamadaValue = removerDaFila(f);
 
@@ -492,6 +493,8 @@ void callPass(Fila &f)
         std::string atualSenhaStr = convert.str();
 
         salvarSenhaChamada(atualSenhaStr);
+
+        std::cout << atualSenhaStr << std::endl;
 
         // Passe a string como parâmetro para a função callRequest
         callRequest(atualSenhaStr);
