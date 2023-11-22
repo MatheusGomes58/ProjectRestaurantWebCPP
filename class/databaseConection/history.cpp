@@ -81,21 +81,27 @@ void listHistorys()
                 historyJson["Senha"] = history.Senha;
                 historyJson["Atendimento"] = history.Atendimento;
                 historyJson["Origem"] = "history";
-                
 
                 // Verifique se a string 'history.Senha' é válida antes de converter para int
-                if (!history.Senha.empty()) {
-                    try {
+                if (!history.Senha.empty())
+                {
+                    try
+                    {
                         int senhaAtualValue = std::stoi(history.Senha);
-                        if (senhaAtualValue > programSenha) {
+                        if (senhaAtualValue > programSenha)
+                        {
                             programSenha = senhaAtualValue;
                         }
-                    } catch (const std::invalid_argument& ia) {
+                    }
+                    catch (const std::invalid_argument &ia)
+                    {
                         std::cerr << "Erro de argumento inválido: " << ia.what() << std::endl;
-                    } catch (const std::out_of_range& oor) {
+                    }
+                    catch (const std::out_of_range &oor)
+                    {
                         std::cerr << "Erro de estouro: " << oor.what() << std::endl;
                     }
-                } 
+                }
 
                 // Converter o objeto JSON em uma string e adicionar à lista
                 if (!listofHistorys.empty())

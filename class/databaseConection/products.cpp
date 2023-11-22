@@ -102,12 +102,12 @@ void dellProduct(const product &product)
                 std::getline(iss, tempo))
             {
                 if (!(product.Origem == origem &&
-                        description == descricao &&
-                        product.Foto == foto &&
-                        product.Produto == produto &&
-                        product.Preço == preco &&
-                        product.Quantidade == quantidade &&
-                        product.Tempo == tempo))
+                      description == descricao &&
+                      product.Foto == foto &&
+                      product.Produto == produto &&
+                      product.Preço == preco &&
+                      product.Quantidade == quantidade &&
+                      product.Tempo == tempo))
                 {
                     temporario << origem << "|" << descricao << "|" << foto << "|"
                                << produto << "|" << preco << "|"
