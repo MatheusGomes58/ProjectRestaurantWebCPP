@@ -99,6 +99,9 @@
             }
 
             function toggleSection(sectionId) {
+                // Salvando o sectionId no localStorage com a tag "page"
+                localStorage.setItem('page', sectionId);
+
                 const sections = document.querySelectorAll("main > section");
                 sections.forEach((section) => {
                     section.style.display = "none";
@@ -161,7 +164,7 @@
                         <button class="btn btn-outline-secondary" onclick="callItem()">Chamar o Próximo</button>
                 </div>
                 <div class="card col-6" style="margin: 3%; 
-                    height: 300px; padding: 1%; overflow-y: auto;" id="tableOfPass">    
+                    height: 300px; padding: 1%; overflow-y: auto;" id="tableOfPass">
                 </div>
             </div>
         </section>
@@ -672,7 +675,7 @@
             }
         }
 
-        function renderPassword(value){
+        function renderPassword(value) {
             document.getElementById("senhaChamada").innerHTML = value;
         }
 
@@ -1022,7 +1025,19 @@
             valortotalElement.innerHTML = "R$ " + valorTotal;
         }
 
-        toggleSection('menu')
+        // Função para verificar o valor no localStorage e agir em conformidade
+        function checkLocalStorage() {
+            // Obtém o valor da tag "page" no localStorage
+            const storedPage = localStorage.getItem('page');
+
+            if (storedPage) {
+                toggleSection(storedPage);
+            } else {
+                toggleSection('menu');
+            }
+        }
+
+        checkLocalStorage();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
