@@ -1,5 +1,5 @@
 #include <iostream>
-#include <iomanip> 
+#include <iomanip>
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -28,13 +28,12 @@ void processJson(json jsonResponse, Fila &filaComum, Fila &filaPreferencial)
     {
         // Obtém o valor do campo "type"
         std::string type = jsonResponse["type"];
-        
+
         // Realiza operações com base no valor do campo "type"
         if (type == "requests")
         {
             // Salva uma nova solicitação e registra no histórico
             saveRequest(jsonResponse);
-            saveHistory(jsonResponse);
         }
         else if (type == "requestDelete")
         {
@@ -45,7 +44,6 @@ void processJson(json jsonResponse, Fila &filaComum, Fila &filaPreferencial)
         {
             // Atualiza uma solicitação e registra no histórico
             updateRequest(jsonResponse);
-            saveHistory(jsonResponse);
         }
         else if (type == "products")
         {
@@ -91,6 +89,11 @@ void processJson(json jsonResponse, Fila &filaComum, Fila &filaPreferencial)
         {
             // Limpa o valor de pesquisa
             searchValue = "";
+        }
+        else if (type == "alert")
+        {
+            // Limpa o valor da mensagem de alerta
+            alert = "";
         }
         else
         {
@@ -140,7 +143,7 @@ int main()
         {
             // Adiciona um caractere nulo ao final do buffer
             buffer[read_size] = '\0';
-            
+
             // Localiza o início da requisição HTTP após os cabeçalhos
             char *request_start = strstr(buffer, "\r\n\r\n");
             std::string form_response;
@@ -151,7 +154,7 @@ int main()
                 {
                     // Parseia o JSON a partir da requisição HTTP
                     json jsonResponse = json::parse(request_start + 4);
-                    
+
                     // Processa o JSON, realizando operações específicas com base no campo "type"
                     processJson(jsonResponse, filaComum, filaPreferencial);
                 }
@@ -163,7 +166,7 @@ int main()
 
             // Carrega o conteúdo de um arquivo HTML em uma string e inclui dados dinâmicos
             loadHtmlFileIntoString("./html/program.html", form_response, filaComum, filaPreferencial);
-            
+
             // Envia a resposta HTTP de volta ao cliente
             write(client_fd, form_response.c_str(), form_response.size());
         }

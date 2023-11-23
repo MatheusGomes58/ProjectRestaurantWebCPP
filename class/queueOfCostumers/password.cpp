@@ -1,19 +1,3 @@
-// Definição de uma estrutura para representar uma fila
-struct Fila
-{
-    std::size_t capacidade; // Capacidade máxima da fila
-    std::vector<int> dados; // Vetor para armazenar os dados da fila
-    std::size_t primeiro;   // Índice do primeiro elemento na fila
-    std::size_t ultimo;     // Índice do último elemento na fila
-    std::size_t nItens;     // Número atual de elementos na fila
-
-    // Construtor padrão da fila, inicializando valores padrão
-    Fila() : capacidade(200), dados(capacidade), primeiro(0), ultimo(-1), nItens(0) {}
-
-    // Destrutor padrão da fila (o vetor é automaticamente liberado quando sai do escopo)
-    ~Fila() {}
-};
-
 // Função para criar uma fila com capacidade predefinida
 void criarFila(Fila &f)
 {

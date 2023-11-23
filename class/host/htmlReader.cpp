@@ -35,6 +35,8 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         targetString.append("<script>renderUsers('" + listofClients + "')</script>");
         targetString.append("<script>renderHistory('" + listofHistorys + "','" + searchValue +"')</script>");
         targetString.append("<script>renderPassword('" + senhaChamada + "')</script>");
+        targetString.append("<script>renderAlert('" + alert + "')</script>");
+
         // Desabilita a solicitação se não houver clientes ou produtos listados
         if (!(listofClients.length() > 0 && listofProducts.length() > 0))
         {

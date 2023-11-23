@@ -1,22 +1,5 @@
-// Definição da estrutura 'history' para armazenar informações históricas
-struct history
-{
-    std::string Cliente;
-    std::vector<std::string> Produto;
-    std::vector<std::string> Quantidade;
-    std::vector<std::string> Observação;
-    std::string Data;
-    std::string Hora;
-    std::string Preco;
-    std::string Senha;
-    std::string Atendimento;
-};
-
-std::string listofHistorys;
-std::string searchValue;
-
 // Função para adicionar uma entrada histórica ao arquivo CSV
-void addHistory(const history &history)
+void addHistory(const request &history)
 {
     std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
 
@@ -60,7 +43,7 @@ void listHistorys(std::string &searchValueData)
         while (std::getline(databaseOfHistorys, line))
         {
             std::istringstream iss(line);
-            history history;
+            request history;
             std::string Produto, Quantidade, Observação;
 
             // Extrair informações da linha CSV e preencher a estrutura 'history'
@@ -134,76 +117,5 @@ void listHistorys(std::string &searchValueData)
 
         databaseOfHistorys.close();
     }
-    return;
-}
-
-// Mapear um objeto JSON para a estrutura 'history'
-history historyMap(json jsonResponse, std::string premissa)
-{
-    history history;
-    if (jsonResponse.contains(premissa + "Cliente"))
-    {
-        history.Cliente = jsonResponse[premissa + "Cliente"];
-    }
-    if (jsonResponse.contains(premissa + "Observação"))
-    {
-        history.Observação = jsonResponse[premissa + "Observação"];
-    }
-    if (jsonResponse.contains(premissa + "Produto"))
-    {
-        history.Produto = jsonResponse[premissa + "Produto"];
-    }
-    if (jsonResponse.contains(premissa + "Data"))
-    {
-        history.Data = jsonResponse[premissa + "Data"];
-    }
-    if (jsonResponse.contains(premissa + "Hora"))
-    {
-        history.Hora = jsonResponse[premissa + "Hora"];
-    }
-    if (jsonResponse.contains(premissa + "Quantidade"))
-    {
-        history.Quantidade = jsonResponse[premissa + "Quantidade"];
-    }
-    if (jsonResponse.contains(premissa + "Preço"))
-    {
-        history.Preco = jsonResponse[premissa + "Preço"];
-    }
-    if (jsonResponse.contains(premissa + "Senha"))
-    {
-        history.Senha = jsonResponse[premissa + "Senha"];
-    }
-    if (jsonResponse.contains(premissa + "Atendimento"))
-    {
-        history.Atendimento = jsonResponse[premissa + "Atendimento"];
-    }
-    return history;
-}
-
-// Função para salvar uma nova entrada histórica com base em um objeto JSON
-void saveHistory(json jsonResponse)
-{
-    history newHistory = historyMap(jsonResponse, "");
-
-    // Obter a data e hora atuais
-    time_t now = time(0);
-    tm *localTime = localtime(&now);
-
-    // Formatar a data e hora e atribuir à nova entrada histórica
-    char dataBuffer[11];
-    strftime(dataBuffer, sizeof(dataBuffer), "%d/%m/%Y", localTime);
-    newHistory.Data = dataBuffer;
-
-    char timeBuffer[10];
-    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
-    newHistory.Hora = timeBuffer;
-
-    
-    newHistory.Senha = std::to_string(programSenha + 1);
-
-    newHistory.Senha = std::string(3 -  newHistory.Senha.length(), '0') + newHistory.Senha;
-
-    // Adicionar a nova entrada histórica ao arquivo CSV
-    addHistory(newHistory);
     return;
 }

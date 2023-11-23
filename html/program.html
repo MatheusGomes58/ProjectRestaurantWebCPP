@@ -722,6 +722,16 @@
             }
         }
 
+        function renderAlert(alerta) {
+            if (alerta) {
+                alert(alerta);
+                jsonData = {
+                    type: "alert"
+                }
+                sendJsonToBack(jsonData);
+            }
+        }
+
         function renderHistory(dateList, campoPesquisado) {
             if (dateList && dateList.length > 0) {
                 document.getElementById("history").innerHTML = renderTable(dateList, false, false, true);

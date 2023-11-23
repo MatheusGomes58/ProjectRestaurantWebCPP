@@ -1,15 +1,3 @@
-// Definição da estrutura 'client' com campos para Nome, Email, Numero e Classificacao.
-struct client
-{
-    std::string Nome;
-    std::string Email;
-    std::string Numero;
-    std::string Classificacao;
-};
-
-// Declaração de uma string para armazenar a lista de clientes.
-std::string listofClients;
-
 // Função para adicionar um cliente ao arquivo CSV.
 void addClient(const client &client)
 {

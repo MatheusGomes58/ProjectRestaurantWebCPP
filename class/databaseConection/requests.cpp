@@ -1,48 +1,3 @@
-std::string createStringList(const std::vector<std::string> &observacaoList)
-{
-    std::string observacao;
-    for (size_t i = 0; i < observacaoList.size(); i++)
-    {
-        if (i > 0)
-        {
-            observacao += ";";
-        }
-        observacao += observacaoList[i];
-    }
-    return observacao;
-}
-
-// Função auxiliar para dividir uma string com um delimitador
-std::vector<std::string> splitString(const std::string &input, char delimiter)
-{
-    std::vector<std::string> result;
-    std::istringstream iss(input);
-    std::string token;
-    while (std::getline(iss, token, delimiter))
-    {
-        result.push_back(token);
-    }
-    return result;
-}
-
-struct request
-{
-    std::string Cliente;
-    std::vector<std::string> Produto;
-    std::vector<std::string> Quantidade;
-    std::vector<std::string> Observação;
-    std::string Data;
-    std::string Hora;
-    std::string Preco;
-    std::string Senha;
-    std::string Atendimento;
-};
-
-std::string listofRequests;
-std::string senhaChamada;
-int programSenha = 0;
-int atualSenha = 0;
-
 void addRequest(const request &request)
 {
     std::fstream databaseOfRequests("./database/requests.csv", std::ios::app | std::ios::in | std::ios::out);
@@ -432,9 +387,30 @@ void saveRequest(json jsonResponse)
 
     newRequest.Senha = std::to_string(programSenha + 1);
 
-    newRequest.Senha = std::string(3 -  newRequest.Senha.length(), '0') + newRequest.Senha;
+    newRequest.Senha = std::string(3 - newRequest.Senha.length(), '0') + newRequest.Senha;
 
+    for (int i = 0; i < newRequest.Produto.size(); i++)
+    {
+        product produto = searchProducts(newRequest.Produto[i]);
+
+        // Convert string to numerical values
+        int newRequestQuantity = std::stoi(newRequest.Quantidade[i]);
+        int produtoQuantity = std::stoi(produto.Quantidade);
+
+        if (newRequestQuantity > produtoQuantity)
+        {
+            alert = "não foi possivel cadastrar o produto, pois a quantidade informada é maior que a quantidade disponível!";
+            return;
+        }
+        else
+        {
+            product produtoNovo = produto;
+            produtoNovo.Quantidade = std::to_string(produtoQuantity - newRequestQuantity);
+            editProduct(produto, produtoNovo);
+        }
+    }
     addRequest(newRequest);
+    addHistory(newRequest);
     return;
 }
 
@@ -461,6 +437,7 @@ void updateRequest(json jsonResponse)
     UpdateRequest.Hora = timeBuffer;
 
     editRequest(oldRequest, UpdateRequest);
+    addHistory(UpdateRequest);
     return;
 }
 
@@ -514,7 +491,7 @@ void callPass(Fila &filaComum, Fila &filaPreferencial)
 
     std::string atualSenhaStr = std::to_string(senhaChamadaValue);
 
-    atualSenhaStr = std::string(3 -  atualSenhaStr.length(), '0') + atualSenhaStr;
+    atualSenhaStr = std::string(3 - atualSenhaStr.length(), '0') + atualSenhaStr;
 
     salvarSenhaChamada(atualSenhaStr);
 

@@ -1,16 +1,3 @@
-struct product
-{
-    std::string Origem;
-    std::vector<std::string> Descrição;
-    std::string Foto;
-    std::string Produto;
-    std::string Preço;
-    std::string Quantidade;
-    std::string Tempo;
-};
-
-std::string listofProducts;
-
 void addProduct(const product &product)
 {
     std::string descricao = createStringList(product.Descrição);
@@ -71,6 +58,38 @@ void listProducts()
     {
         std::cerr << "Erro ao abrir o arquivo de produtos." << std::endl;
     }
+}
+
+product searchProducts(const std::string& produto) {
+    product foundProducts;
+    std::fstream databaseOfProducts("./database/products.csv");
+    if (databaseOfProducts.is_open()) {
+        std::string line;
+        while (std::getline(databaseOfProducts, line)) {
+            std::istringstream iss(line);
+            product currentProduct;
+            std::string descricao;
+
+            if (std::getline(iss, currentProduct.Origem, '|') &&
+                std::getline(iss, descricao, '|') &&
+                std::getline(iss, currentProduct.Foto, '|') &&
+                std::getline(iss, currentProduct.Produto, '|') &&
+                std::getline(iss, currentProduct.Preço, '|') &&
+                std::getline(iss, currentProduct.Quantidade, '|') &&
+                std::getline(iss, currentProduct.Tempo))
+            {
+                std::vector<std::string> description = splitString(descricao, ';');
+                currentProduct.Descrição = description;
+                if (currentProduct.Produto == produto) {
+                    foundProducts = currentProduct;
+                }
+            }
+        }
+        databaseOfProducts.close();
+    } else {
+        std::cerr << "Erro ao abrir o arquivo de produtos." << std::endl;
+    }
+    return foundProducts;
 }
 
 void dellProduct(const product &product)
