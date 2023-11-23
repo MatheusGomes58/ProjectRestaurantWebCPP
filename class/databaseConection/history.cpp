@@ -47,6 +47,7 @@ void listHistorys(std::string &searchValueData)
 {
     std::fstream databaseOfHistorys("./database/historys.csv");
     listofHistorys = "";
+    std::string senhaEncontrada;
 
     if (databaseOfHistorys.is_open())
     {
@@ -105,11 +106,11 @@ void listHistorys(std::string &searchValueData)
                 }
                 // Converter o objeto JSON em uma string e adicionar à lista
                 if (searchValueData == "" ||
-                    history.Cliente.find(searchValueData) != std::string::npos ||
+                    history.Cliente == searchValueData ||
                     history.Data.find(searchValueData) != std::string::npos ||
                     history.Hora.find(searchValueData) != std::string::npos ||
-                    history.Preco.find(searchValueData) != std::string::npos ||
-                    history.Senha.find(searchValueData) != std::string::npos ||
+                    history.Preco == searchValueData ||
+                    history.Senha == searchValueData ||
                     history.Atendimento.find(searchValueData) != std::string::npos)
                 {
                     if (!listofHistorys.empty())
@@ -117,8 +118,15 @@ void listHistorys(std::string &searchValueData)
                         listofHistorys += ",";
                     }
                     listofHistorys += historyJson.dump();
+                    if (history.Senha == searchValueData)
+                    {
+                        senhaEncontrada = historyJson.dump();
+                    }
                 }
             }
+        }
+        if(senhaEncontrada != ""){
+           listofHistorys = senhaEncontrada; 
         }
 
         databaseOfHistorys.close();
