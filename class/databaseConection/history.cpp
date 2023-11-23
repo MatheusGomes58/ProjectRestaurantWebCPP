@@ -1,3 +1,4 @@
+// Definição da estrutura 'history' para armazenar informações históricas
 struct history
 {
     std::string Cliente;
@@ -14,9 +15,11 @@ struct history
 std::string listofHistorys;
 std::string searchValue;
 
+// Função para adicionar uma entrada histórica ao arquivo CSV
 void addHistory(const history &history)
 {
     std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
+
     if (databaseOfHistorys.is_open())
     {
         std::string Produto, Quantidade, Observação;
@@ -24,6 +27,7 @@ void addHistory(const history &history)
         Quantidade = createStringList(history.Quantidade);
         Observação = createStringList(history.Observação);
 
+        // Escrever a entrada histórica no arquivo CSV
         databaseOfHistorys << history.Cliente << "|"
                            << Produto << "|"
                            << Quantidade << "|"
@@ -43,6 +47,7 @@ void addHistory(const history &history)
     return;
 }
 
+// Função para listar as entradas históricas com base em um valor de pesquisa
 void listHistorys(std::string &searchValueData)
 {
     std::fstream databaseOfHistorys("./database/historys.csv");
@@ -58,6 +63,7 @@ void listHistorys(std::string &searchValueData)
             history history;
             std::string Produto, Quantidade, Observação;
 
+            // Extrair informações da linha CSV e preencher a estrutura 'history'
             if (std::getline(iss, history.Cliente, '|') &&
                 std::getline(iss, Produto, '|') &&
                 std::getline(iss, Quantidade, '|') &&
@@ -68,7 +74,7 @@ void listHistorys(std::string &searchValueData)
                 std::getline(iss, history.Senha, '|') &&
                 std::getline(iss, history.Atendimento, '\n'))
             {
-                // Criar um objeto JSON para representar a solicitação
+                // Criar um objeto JSON para representar a entrada histórica
                 json historyJson;
                 historyJson["Cliente"] = history.Cliente;
                 historyJson["Data"] = history.Data;
@@ -84,27 +90,13 @@ void listHistorys(std::string &searchValueData)
                 historyJson["Atendimento"] = history.Atendimento;
                 historyJson["Origem"] = "history";
 
-                // Verifique se a string 'history.Senha' é válida antes de converter para int
-                if (!history.Senha.empty())
+                // Verificar se a senha encontrada é igual ao valor de pesquisa
+                if (history.Senha == searchValueData)
                 {
-                    try
-                    {
-                        int senhaAtualValue = std::stoi(history.Senha);
-                        if (senhaAtualValue > programSenha)
-                        {
-                            programSenha = senhaAtualValue;
-                        }
-                    }
-                    catch (const std::invalid_argument &ia)
-                    {
-                        std::cerr << "Erro de argumento inválido: " << ia.what() << std::endl;
-                    }
-                    catch (const std::out_of_range &oor)
-                    {
-                        std::cerr << "Erro de estouro: " << oor.what() << std::endl;
-                    }
+                    senhaEncontrada = historyJson.dump();
                 }
-                // Converter o objeto JSON em uma string e adicionar à lista
+
+                // Verificar se a entrada atende aos critérios de pesquisa e adicionar à lista
                 if (searchValueData == "" ||
                     history.Cliente == searchValueData ||
                     history.Data.find(searchValueData) != std::string::npos ||
@@ -118,15 +110,14 @@ void listHistorys(std::string &searchValueData)
                         listofHistorys += ",";
                     }
                     listofHistorys += historyJson.dump();
-                    if (history.Senha == searchValueData)
-                    {
-                        senhaEncontrada = historyJson.dump();
-                    }
                 }
             }
         }
-        if(senhaEncontrada != ""){
-           listofHistorys = senhaEncontrada; 
+
+        // Se uma senha específica foi encontrada, a lista é atualizada apenas com essa entrada
+        if (senhaEncontrada != "")
+        {
+            listofHistorys = senhaEncontrada;
         }
 
         databaseOfHistorys.close();
@@ -134,6 +125,7 @@ void listHistorys(std::string &searchValueData)
     return;
 }
 
+// Mapear um objeto JSON para a estrutura 'history'
 history historyMap(json jsonResponse, std::string premissa)
 {
     history history;
@@ -176,12 +168,16 @@ history historyMap(json jsonResponse, std::string premissa)
     return history;
 }
 
+// Função para salvar uma nova entrada histórica com base em um objeto JSON
 void saveHistory(json jsonResponse)
 {
     history newHistory = historyMap(jsonResponse, "");
 
+    // Obter a data e hora atuais
     time_t now = time(0);
     tm *localTime = localtime(&now);
+
+    // Formatar a data e hora e atribuir à nova entrada histórica
     char dataBuffer[11];
     strftime(dataBuffer, sizeof(dataBuffer), "%d/%m/%Y", localTime);
     newHistory.Data = dataBuffer;
@@ -190,8 +186,10 @@ void saveHistory(json jsonResponse)
     strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
     newHistory.Hora = timeBuffer;
 
+    // Atribuir uma senha à nova entrada histórica
     newHistory.Senha = std::to_string(programSenha + 1);
 
+    // Adicionar a nova entrada histórica ao arquivo CSV
     addHistory(newHistory);
     return;
 }
