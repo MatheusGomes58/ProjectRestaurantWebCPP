@@ -1,8 +1,6 @@
 # ProjectRestaurantWebCPP
 <br>Autor: MatheusGomes58
 <br>
-RA: 200014026
-<br>
 Turma: Engenharia da Computação
 <br>
 Turno: Segundo semestre Algoritmos e Programação II – Prof. Celso
