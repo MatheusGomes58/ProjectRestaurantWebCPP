@@ -90,6 +90,16 @@ void listHistorys(std::string &searchValueData)
                 historyJson["Atendimento"] = history.Atendimento;
                 historyJson["Origem"] = "history";
 
+                // Verifique se a string 'history.Senha' é válida antes de converter para int
+                if (!history.Senha.empty())
+                {
+                    int senhaAtualValue = std::stoi(history.Senha);
+                    if (senhaAtualValue > programSenha)
+                    {
+                        programSenha = senhaAtualValue;
+                    }
+                }
+
                 // Verificar se a senha encontrada é igual ao valor de pesquisa
                 if (history.Senha == searchValueData)
                 {
