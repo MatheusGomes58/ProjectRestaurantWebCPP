@@ -50,6 +50,14 @@ void processJson(json jsonResponse, Fila &filaComum, Fila &filaPreferencial)
         {
             callPass(filaComum, filaPreferencial);
         }
+        else if (type == "search")
+        {
+            searchValue = jsonResponse["valor"];
+        }
+        else if (type == "cleanSearch")
+        {
+            searchValue = "";
+        }
         else
         {
             std::cout << "tipo de processo desconhecido" << std::endl;

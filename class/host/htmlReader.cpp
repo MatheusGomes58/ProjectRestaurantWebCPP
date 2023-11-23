@@ -7,7 +7,7 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
 {
     listProducts();
     listClients();
-    listHistorys();
+    listHistorys(searchValue);
     listRequests(filaComum, filaPreferencial);
     lerSenhaChamada();
 
@@ -31,7 +31,7 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         targetString.append("<script>renderRequests('" + listofRequests + "')</script>");
         targetString.append("<script>renderProducts('" + listofProducts + "')</script>");
         targetString.append("<script>renderUsers('" + listofClients + "')</script>");
-        targetString.append("<script>renderHistory('" + listofHistorys + "')</script>");
+        targetString.append("<script>renderHistory('" + listofHistorys + "','" + searchValue +"')</script>");
         targetString.append("<script>renderPassword('" + senhaChamada + "')</script>");
         if (!(listofClients.length() > 0 && listofProducts.length() > 0))
         {

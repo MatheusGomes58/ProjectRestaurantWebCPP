@@ -12,6 +12,7 @@ struct history
 };
 
 std::string listofHistorys;
+std::string searchValue;
 
 void addHistory(const history &history)
 {
@@ -42,7 +43,7 @@ void addHistory(const history &history)
     return;
 }
 
-void listHistorys()
+void listHistorys(std::string &searchValueData)
 {
     std::fstream databaseOfHistorys("./database/historys.csv");
     listofHistorys = "";
@@ -102,13 +103,21 @@ void listHistorys()
                         std::cerr << "Erro de estouro: " << oor.what() << std::endl;
                     }
                 }
-
                 // Converter o objeto JSON em uma string e adicionar à lista
-                if (!listofHistorys.empty())
+                if (searchValueData == "" ||
+                    history.Cliente.find(searchValueData) != std::string::npos ||
+                    history.Data.find(searchValueData) != std::string::npos ||
+                    history.Hora.find(searchValueData) != std::string::npos ||
+                    history.Preco.find(searchValueData) != std::string::npos ||
+                    history.Senha.find(searchValueData) != std::string::npos ||
+                    history.Atendimento.find(searchValueData) != std::string::npos)
                 {
-                    listofHistorys += ",";
+                    if (!listofHistorys.empty())
+                    {
+                        listofHistorys += ",";
+                    }
+                    listofHistorys += historyJson.dump();
                 }
-                listofHistorys += historyJson.dump();
             }
         }
 
