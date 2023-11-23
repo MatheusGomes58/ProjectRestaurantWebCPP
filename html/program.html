@@ -1124,34 +1124,6 @@
         // Variável para verificar se o modal está aberto
         let modalOpened = false;
 
-        // Função para recarregar a página a cada segundo, exceto se o modal estiver aberto
-        function reloadPage() {
-            // Verifica se o modal está aberto
-            if (!modalOpened) {
-                // Recarrega a página
-                window.location.reload();
-            }
-        }
-
-        // Função para verificar a cada segundo
-        function checkReload() {
-            // Executa a função reloadPage a cada segundo
-        setInterval(reloadPage, 5000);
-        }
-
-        // Função para ser executada ao abrir a página HTML
-        function onPageLoad() {
-            // Execute qualquer lógica adicional que você precise ao carregar a página
-            console.log("Página carregada!");
-
-            // Inicia a verificação de recarregamento
-            checkReload();
-        }
-
-        // Chama a função ao abrir a página HTML
-        document.addEventListener("DOMContentLoaded", onPageLoad);
-
-
         checkLocalStorage();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

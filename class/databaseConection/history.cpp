@@ -111,6 +111,8 @@ void listHistorys(std::string &searchValueData)
                     history.Cliente == searchValueData ||
                     history.Data.find(searchValueData) != std::string::npos ||
                     history.Hora.find(searchValueData) != std::string::npos ||
+                    Produto.find(searchValueData) != std::string::npos ||
+                    Observação.find(searchValueData) != std::string::npos ||
                     history.Preco == searchValueData ||
                     history.Senha == searchValueData ||
                     history.Atendimento.find(searchValueData) != std::string::npos)
@@ -196,8 +198,10 @@ void saveHistory(json jsonResponse)
     strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
     newHistory.Hora = timeBuffer;
 
-    // Atribuir uma senha à nova entrada histórica
+    
     newHistory.Senha = std::to_string(programSenha + 1);
+
+    newHistory.Senha = std::string(3 -  newHistory.Senha.length(), '0') + newHistory.Senha;
 
     // Adicionar a nova entrada histórica ao arquivo CSV
     addHistory(newHistory);

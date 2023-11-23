@@ -120,7 +120,6 @@ void listRequests(Fila &filaComum, Fila &filaPreferencial)
                 }
                 listofRequests += requestJson.dump();
 
-
                 int senhaAtualValue = std::stoi(request.Senha);
                 if (request.Atendimento == "Comum")
                 {
@@ -129,7 +128,9 @@ void listRequests(Fila &filaComum, Fila &filaPreferencial)
                     {
                         atualSenha = senhaAtualValue;
                     }
-                }else{
+                }
+                else
+                {
                     inserirNaFila(filaPreferencial, senhaAtualValue);
                     if (senhaAtualValue < atualSenha)
                     {
@@ -431,6 +432,8 @@ void saveRequest(json jsonResponse)
 
     newRequest.Senha = std::to_string(programSenha + 1);
 
+    newRequest.Senha = std::string(3 -  newRequest.Senha.length(), '0') + newRequest.Senha;
+
     addRequest(newRequest);
     return;
 }
@@ -490,7 +493,8 @@ void lerSenhaChamada()
     }
 }
 
-void callPass(Fila& filaComum, Fila& filaPreferencial) {
+void callPass(Fila &filaComum, Fila &filaPreferencial)
+{
     int senhaChamadaValue = 0;
 
     // Inicializa a semente do gerador de números aleatórios
@@ -499,15 +503,18 @@ void callPass(Fila& filaComum, Fila& filaPreferencial) {
     // Gera um número aleatório de 0 a 10
     int numeroAleatorio = std::rand() % 11;
 
-    if (numeroAleatorio > 7 && estaVazia(filaComum)) {
+    if (numeroAleatorio > 7 && estaVazia(filaComum))
+    {
         senhaChamadaValue = removerDaFila(filaComum);
-    } else if (estaVazia(filaPreferencial)) {
+    }
+    else if (estaVazia(filaPreferencial))
+    {
         senhaChamadaValue = removerDaFila(filaPreferencial);
     }
 
-    std::ostringstream convert;
-    convert << senhaChamadaValue;
-    std::string atualSenhaStr = convert.str();
+    std::string atualSenhaStr = std::to_string(senhaChamadaValue);
+
+    atualSenhaStr = std::string(3 -  atualSenhaStr.length(), '0') + atualSenhaStr;
 
     salvarSenhaChamada(atualSenhaStr);
 
