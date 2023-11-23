@@ -64,21 +64,3 @@ void mostrarFila(const Fila &f)
     }
     std::cout << "\n\n";
 }
-/*/
-int main()
-{
-    
-
-    // Teste das funções
-    inserirNaFila(umaFila, 1);
-    inserirNaFila(umaFila, 2);
-    inserirNaFila(umaFila, 3);
-
-    mostrarFila(umaFila);
-
-    removerDaFila(umaFila);
-
-    mostrarFila(umaFila);
-
-    return 0;
-}*/

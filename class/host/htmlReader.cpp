@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 
-void loadHtmlFileIntoString(const std::string &filename, std::string &targetString, Fila &f)
+void loadHtmlFileIntoString(const std::string &filename, std::string &targetString, Fila &filaComum, Fila &filaPreferencial)
 {
     listProducts();
     listClients();
     listHistorys();
-    listRequests(f);
+    listRequests(filaComum, filaPreferencial);
     lerSenhaChamada();
 
     std::ifstream file(filename, std::ios::in | std::ios::binary);

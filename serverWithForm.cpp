@@ -1,6 +1,6 @@
 #include "./class/managementClasses.cpp"
 
-void processJson(json jsonResponse, Fila &f)
+void processJson(json jsonResponse, Fila &filaComum, Fila &filaPreferencial)
 {
     std::cout << "Received Data:\n"
               << jsonResponse << std::endl;
@@ -48,7 +48,7 @@ void processJson(json jsonResponse, Fila &f)
         }
         else if (type == "callPass")
         {
-            callPass(f);
+            callPass(filaComum, filaPreferencial);
         }
         else
         {
@@ -59,13 +59,15 @@ void processJson(json jsonResponse, Fila &f)
 
 int main()
 {
-    Fila umaFila;
+    Fila filaComum;
+    Fila filaPreferencial;
     int sock;
     createConnection(sock);
 
     while (true)
     {
-        criarFila(umaFila);
+        criarFila(filaComum);
+        criarFila(filaPreferencial);
         int client_fd;
         struct sockaddr_in cli_addr;
         socklen_t sin_len = sizeof(cli_addr);
@@ -91,13 +93,13 @@ int main()
                 try
                 {
                     json jsonResponse = json::parse(request_start + 4);
-                    processJson(jsonResponse, umaFila);
+                    processJson(jsonResponse, filaComum, filaPreferencial);
                 }
                 catch (const std::exception &e)
                 {
                 }
             }
-            loadHtmlFileIntoString("./html/program.html", form_response, umaFila);
+            loadHtmlFileIntoString("./html/program.html", form_response, filaComum, filaPreferencial);
             write(client_fd, form_response.c_str(), form_response.size());
         }
 

@@ -592,7 +592,7 @@
     <script>
         var listOfJson = [];
         var contadorDeItens = 1;
-        function preparateJsonList(dateList) {
+        function preparateJsonList(dateList, order) {
             if (dateList) {
                 var dateJSON = dateList;
 
@@ -635,7 +635,7 @@
                 });
 
                 // Ordena o array por "Data" e "Hora" se os campos existirem
-                if (dateJSON.length > 0 && 'Data' in dateJSON[0] && 'Hora' in dateJSON[0]) {
+                if (dateJSON.length > 0 && 'Data' in dateJSON[0] && 'Hora' in dateJSON[0] && order) {
                     dateJSON.sort(function (b, a) {
                         var dateComparison = a.Data.localeCompare(b.Data);
                         return dateComparison !== 0 ? dateComparison : a.Hora.localeCompare(b.Hora);
@@ -651,14 +651,14 @@
 
         function renderRequests(dateList) {
             if (dateList && dateList.length > 0) {
-                document.getElementById("updatePedidos").innerHTML = renderTable(dateList, true);
-                document.getElementById("tableOfPass").innerHTML = renderTable(dateList, false, true);
+                document.getElementById("updatePedidos").innerHTML = renderTable(dateList, true, true);
+                document.getElementById("tableOfPass").innerHTML = renderTable(dateList, false, true, false);
             }
         }
 
         function renderHistory(dateList) {
             if (dateList && dateList.length > 0) {
-                document.getElementById("history").innerHTML = renderTable(dateList);
+                document.getElementById("history").innerHTML = renderTable(dateList, false, false, true);
             }
         }
 
@@ -703,8 +703,8 @@
             return optionlist;
         }
 
-        function renderTable(dateList, edit, passwordList) {
-            dateList = preparateJsonList(dateList);
+        function renderTable(dateList, edit, passwordList, order) {
+            dateList = preparateJsonList(dateList, order);
 
             // Defina a ordem desejada das colunas
             var columnOrder;
@@ -1054,7 +1054,7 @@
         // Função para verificar a cada segundo
         function checkReload() {
             // Executa a função reloadPage a cada segundo
-            setInterval(reloadPage, 2000);
+            setInterval(reloadPage, 10000);
         }
 
         // Função para ser executada ao abrir a página HTML

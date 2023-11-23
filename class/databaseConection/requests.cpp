@@ -42,7 +42,6 @@ std::string listofRequests;
 std::string senhaChamada;
 int programSenha = 0;
 int atualSenha = 0;
-int tamanhoDaFila = 1;
 
 void addRequest(const request &request)
 {
@@ -72,7 +71,7 @@ void addRequest(const request &request)
     return;
 }
 
-void listRequests(Fila &f)
+void listRequests(Fila &filaComum, Fila &filaPreferencial)
 {
 
     std::fstream databaseOfRequests("./database/requests.csv");
@@ -121,13 +120,22 @@ void listRequests(Fila &f)
                 }
                 listofRequests += requestJson.dump();
 
+
                 int senhaAtualValue = std::stoi(request.Senha);
-                inserirNaFila(f, senhaAtualValue);
-                if (senhaAtualValue < atualSenha)
+                if (request.Atendimento == "Comum")
                 {
-                    atualSenha = senhaAtualValue;
+                    inserirNaFila(filaComum, senhaAtualValue);
+                    if (senhaAtualValue < atualSenha)
+                    {
+                        atualSenha = senhaAtualValue;
+                    }
+                }else{
+                    inserirNaFila(filaPreferencial, senhaAtualValue);
+                    if (senhaAtualValue < atualSenha)
+                    {
+                        atualSenha = senhaAtualValue;
+                    }
                 }
-                tamanhoDaFila++;
             }
         }
         databaseOfRequests.close();
@@ -482,21 +490,29 @@ void lerSenhaChamada()
     }
 }
 
-void callPass(Fila &f)
-{
-    if (estaVazia(f))
-    {
-        int senhaChamadaValue = removerDaFila(f);
+void callPass(Fila& filaComum, Fila& filaPreferencial) {
+    int senhaChamadaValue = 0;
 
-        std::ostringstream convert;
-        convert << senhaChamadaValue;
-        std::string atualSenhaStr = convert.str();
+    // Inicializa a semente do gerador de números aleatórios
+    std::srand(std::time(0));
 
-        salvarSenhaChamada(atualSenhaStr);
+    // Gera um número aleatório de 0 a 10
+    int numeroAleatorio = std::rand() % 11;
 
-        std::cout << atualSenhaStr << std::endl;
-
-        // Passe a string como parâmetro para a função callRequest
-        callRequest(atualSenhaStr);
+    if (numeroAleatorio > 7 && estaVazia(filaComum)) {
+        senhaChamadaValue = removerDaFila(filaComum);
+    } else if (estaVazia(filaPreferencial)) {
+        senhaChamadaValue = removerDaFila(filaPreferencial);
     }
+
+    std::ostringstream convert;
+    convert << senhaChamadaValue;
+    std::string atualSenhaStr = convert.str();
+
+    salvarSenhaChamada(atualSenhaStr);
+
+    std::cout << atualSenhaStr << std::endl;
+
+    // Passe a string como parâmetro para a função callRequest
+    callRequest(atualSenhaStr);
 }
