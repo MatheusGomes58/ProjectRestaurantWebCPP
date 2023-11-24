@@ -373,6 +373,7 @@ request requestMap(json jsonResponse, std::string premissa)
 
 void saveRequest(json jsonResponse)
 {
+    alert = "Falha ao salvar dados do pedido!";
     request newRequest = requestMap(jsonResponse, "");
 
     time_t now = time(0);
@@ -411,11 +412,13 @@ void saveRequest(json jsonResponse)
     }
     addRequest(newRequest);
     addHistory(newRequest, "Inserido");
+    alert = "Sucesso ao inserir dados do Pedido!";
     return;
 }
 
 void deleteRequest(json jsonResponse)
 {
+    alert = "Falha ao deletar dados do Pedido!";
     request deleteRequest = requestMap(jsonResponse, "");
     request delRequestValue = deleteRequest;
 
@@ -452,11 +455,14 @@ void deleteRequest(json jsonResponse)
 
     addHistory(delRequestValue, "Deletado");
     dellRequest(deleteRequest);
+
+    alert = "Sucesso ao deletar dados do pedido!";
     return;
 }
 
 void updateRequest(json jsonResponse)
 {
+    alert = "Falha ao atualizar dados do pedido!";
     request oldRequest = requestMap(jsonResponse, "old_");
     request UpdateRequest = requestMap(jsonResponse, "");
 
@@ -495,6 +501,7 @@ void updateRequest(json jsonResponse)
 
     editRequest(oldRequest, UpdateRequest);
     addHistory(UpdateRequest, "Cancelado");
+    alert = "Sucesso ao atualizar dados do pedido!";
     return;
 }
 

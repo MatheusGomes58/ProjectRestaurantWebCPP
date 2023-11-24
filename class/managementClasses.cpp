@@ -15,6 +15,7 @@ using namespace std;
 /*****************************************************
  * Classes de configuração e conexão banco de dados
  *****************************************************/
+#include "./databaseConection/search.cpp"
 #include "./databaseConection/products.cpp"
 #include "./databaseConection/clients.cpp"
 #include "./databaseConection/history.cpp"

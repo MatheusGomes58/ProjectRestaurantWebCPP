@@ -166,9 +166,7 @@ void editClient(const client &oldClient, const client &newClient)
 
         // Variável para indicar se o cliente a ser editado foi encontrado.
         bool encontrado = false;
-        std
-
-::string line;
+        std::string line;
 
         // Leitura do arquivo de clientes linha por linha.
         while (std::getline(databaseOfClients, line))
@@ -222,6 +220,7 @@ void editClient(const client &oldClient, const client &newClient)
 // Função para salvar um novo cliente no arquivo CSV a partir de um objeto JSON.
 void saveClient(json jsonResponse)
 {
+    alert = "Falha ao salvar dados do cliente!";
     // Criação de um objeto 'client' a partir dos dados fornecidos no objeto JSON.
     client newClient;
     newClient.Nome = jsonResponse["Nome"];
@@ -231,11 +230,13 @@ void saveClient(json jsonResponse)
 
     // Adição do novo cliente ao arquivo CSV.
     addClient(newClient);
+    alert = "Sucesso ao salvar dados do cliente!";
 }
 
 // Função para excluir um cliente do arquivo CSV a partir de um objeto JSON.
 void deleteClient(json jsonResponse)
 {
+    alert = "Falha ao deletar dados do cliente!";
     // Criação de um objeto 'client' a partir dos dados fornecidos no objeto JSON.
     client deleteClient;
     deleteClient.Nome = jsonResponse["Nome"];
@@ -243,13 +244,23 @@ void deleteClient(json jsonResponse)
     deleteClient.Numero = jsonResponse["Numero"];
     deleteClient.Classificacao = jsonResponse["Classificação"];
 
+    bool pedidoCliente = searchRequest(deleteClient.Nome);
+
+    if (pedidoCliente)
+    {
+        alert = "não é possivel deletar este cliente pois ele esta associado a um pedido em aberto!";
+        return;
+    }
+
     // Exclusão do cliente do arquivo CSV.
     dellClient(deleteClient);
+    alert = "Sucesso ao deletar dados do cliente!";
 }
 
 // Função para atualizar um cliente no arquivo CSV a partir de um objeto JSON contendo os dados antigos e novos.
 void updateClient(json jsonResponse)
 {
+    alert = "Falha ao atualizar dados do cliente!";
     // Criação de objetos 'client' representando os dados antigos e novos do cliente.
     client oldClient;
     oldClient.Nome = jsonResponse["old_Nome"];
@@ -265,4 +276,5 @@ void updateClient(json jsonResponse)
 
     // Edição do cliente no arquivo CSV.
     editClient(oldClient, newClient);
+    alert = "Sucesso ao atualizar dados do cliente!";
 }

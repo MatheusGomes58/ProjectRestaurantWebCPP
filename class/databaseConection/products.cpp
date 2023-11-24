@@ -60,12 +60,15 @@ void listProducts()
     }
 }
 
-product searchProducts(const std::string& produto) {
+product searchProducts(const std::string &produto)
+{
     product foundProducts;
     std::fstream databaseOfProducts("./database/products.csv");
-    if (databaseOfProducts.is_open()) {
+    if (databaseOfProducts.is_open())
+    {
         std::string line;
-        while (std::getline(databaseOfProducts, line)) {
+        while (std::getline(databaseOfProducts, line))
+        {
             std::istringstream iss(line);
             product currentProduct;
             std::string descricao;
@@ -80,13 +83,16 @@ product searchProducts(const std::string& produto) {
             {
                 std::vector<std::string> description = splitString(descricao, ';');
                 currentProduct.Descrição = description;
-                if (currentProduct.Produto == produto) {
+                if (currentProduct.Produto == produto)
+                {
                     foundProducts = currentProduct;
                 }
             }
         }
         databaseOfProducts.close();
-    } else {
+    }
+    else
+    {
         std::cerr << "Erro ao abrir o arquivo de produtos." << std::endl;
     }
     return foundProducts;
@@ -250,22 +256,37 @@ product productMap(json jsonResponse, std::string premissa)
 
 void saveProduct(json jsonResponse)
 {
+    alert = "Falha ao criar o produto!";
     product newProduct = productMap(jsonResponse, "");
     addProduct(newProduct);
+    alert = "Sucesso ao atualizar o produto!";
     return;
 }
 
 void deleteProduct(json jsonResponse)
 {
+    alert = "Falha ao deletar o produto!";
     product deleteProduct = productMap(jsonResponse, "");
+
+    bool pedidoProduto = searchRequest(deleteProduct.Produto);
+
+    if (pedidoProduto)
+    {
+        alert = "não é possivel deletar esse produto pois ele esta associado a um pedido em aberto!";
+        return;
+    }
+
     dellProduct(deleteProduct);
+    alert = "Sucesso ao deletar o produto!";
     return;
 }
 
 void updateProduct(json jsonResponse)
 {
+    alert = "Falha ao atualizar o produto!";
     product oldproduct = productMap(jsonResponse, "old_");
     product UpdateProduct = productMap(jsonResponse, "");
     editProduct(oldproduct, UpdateProduct);
+    alert = "Sucesso ao atualizar o produto!";
     return;
 }
