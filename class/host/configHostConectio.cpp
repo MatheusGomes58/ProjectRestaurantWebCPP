@@ -19,7 +19,7 @@ void createConnection(int &sock)
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int));
 
     // Define o número da porta a ser usada
-    int port = 3040;
+    int port = 3080;
 
     // Configura a estrutura do endereço do servidor
     svr_addr.sin_family = AF_INET;           // Família de endereços IPv4

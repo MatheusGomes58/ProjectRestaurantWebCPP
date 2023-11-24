@@ -505,54 +505,28 @@ void updateRequest(json jsonResponse)
     return;
 }
 
-void salvarSenhaChamada(const std::string &senha)
-{
-    std::fstream databaseOfPassword("./database/senhaChamada.csv", std::ios::in | std::ios::out);
-    if (databaseOfPassword.is_open())
-    {
-        databaseOfPassword.clear();
-        databaseOfPassword << senha;
-        databaseOfPassword.close();
-    }
-    else
-    {
-        std::cerr << "Erro ao abrir o arquivo para salvar a senha chamada.\n";
-    }
-}
-
-void lerSenhaChamada()
-{
-    std::fstream databaseOfPassword("./database/senhaChamada.csv");
-    if (databaseOfPassword.is_open())
-    {
-        std::getline(databaseOfPassword, senhaChamada);
-        databaseOfPassword.close();
-    }
-    else
-    {
-        std::cerr << "Erro ao abrir o arquivo para ler a senha chamada.\n";
-    }
-}
-
 void callPass(Fila &filaComum, Fila &filaPreferencial)
 {
+    alert = "Falha ao chamar próximo cliente!";
     int senhaChamadaValue = 0;
 
     // Inicializa a semente do gerador de números aleatórios
     std::srand(std::time(0));
 
-    // Gera um número aleatório de 0 a 10
-    int numeroAleatorio = std::rand() % 11;
-
-    if (numeroAleatorio > 7 && estaVazia(filaComum))
+    while (senhaChamadaValue == 0)
     {
-        senhaChamadaValue = removerDaFila(filaComum);
-    }
-    else if (estaVazia(filaPreferencial))
-    {
-        senhaChamadaValue = removerDaFila(filaPreferencial);
-    }
+        // Gera um número aleatório de 0 a 10
+        int numeroAleatorio = std::rand() % 11;
 
+        if (numeroAleatorio > 7)
+        {
+            senhaChamadaValue = removerDaFila(filaComum);
+        }
+        else
+        {
+            senhaChamadaValue = removerDaFila(filaPreferencial);
+        }
+    }
     std::string atualSenhaStr = std::to_string(senhaChamadaValue);
 
     atualSenhaStr = std::string(3 - atualSenhaStr.length(), '0') + atualSenhaStr;
@@ -563,4 +537,5 @@ void callPass(Fila &filaComum, Fila &filaPreferencial)
 
     // Passe a string como parâmetro para a função callRequest
     callRequest(atualSenhaStr);
+    alert = "Sucesso ao chamar próximo cliente!";
 }

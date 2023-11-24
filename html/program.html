@@ -94,12 +94,15 @@
             </div>
         </div>
         <script>
-            function openModal(modalOpen) {
+            function openModal(modalOpen, firstEdition) {
                 var cliente = document.getElementById("Cliente").value;
                 exibirAtendimento(cliente)
                 modalOpen = document.getElementById(modalOpen);
                 modalOpen.style.display = 'block';
                 modalOpened = true;
+                if (!firstEdition) {
+                    addProduto('', '', contadorDeItens, true)
+                }
             }
 
             function closeModal(modal) {
@@ -287,14 +290,7 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top: 1%;" id="Produto">
-                    <div class="row">
-                        <label for="Produto" class="col">Produto:</label>
-                        <label for="Quantidade" class="col">Quantidade:</label>
-                        <label for="Excluir" class="col-1" style="display: none;" id="ExcluirCol">Excluir:</label>
-                        <label for="Quantidade" class="col-1"
-                            style="display: flex; justify-content: center;">Valor:</label>
-                    </div>
+                <div class="form-group" style="margin-top: 1%;" id="cloneProduto" hidden>
                     <div id="Produto_example">
                         <div class="row" style="margin-top: 1%;">
                             <div class="col">
@@ -304,24 +300,35 @@
                             </div>
                             <div class="col">
                                 <input type="text" class="form-control col-6" id="Quantidade_Produto0" name="Quantidade"
-                                    oninput="this.value = this.value.replace(/[^1-9]/g, ''); exibirValor(0)" required>
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); exibirValor(0)" required>
                             </div>
-                            <div class="col-1" id="ExcluirAqui" style="display: none;"></div>
-                            <label id="Valor0" class="col-1" style="display: flex; justify-content: end;">R$
+                            <div class="col-2" id="ExcluirAqui" style="display: none;"></div>
+                            <label id="Valor0" class="col-2" style="display: flex; justify-content: end;">R$
                                 0.00</label>
                         </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1%;" id="Produto">
+                    <div class="row">
+                        <label for="Produto" class="col">Produto:</label>
+                        <label for="Quantidade" class="col">Quantidade:</label>
+                        <label for="Excluir" class="col-2" id="ExcluirCol">Excluir:</label>
+                        <label for="Quantidade" class="col-2"
+                            style="display: flex; justify-content: center;">Valor:</label>
                     </div>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
                     <div class="row">
                         <label class="col" style="display: flex; justify-content: end;">Total:</label>
-                        <label id="ValorTotal" class="col-1">R$ 0.00</label>
+                        <label id="ValorTotal" class="col-2">R$ 0.00</label>
                     </div>
                 </div>
 
                 <div style="margin-top: 1%;">
-                    <button class="btn btn-outline-secondary" onclick="addProduto('','',contadorDeItens)">Adicionar
+                    <button class="btn btn-outline-secondary"
+                        onclick="addProduto('','',contadorDeItens, false)">Adicionar
                         Produto</button>
                 </div>
 
@@ -355,7 +362,7 @@
 
                     // Validar se todos os campos estão preenchidos
                     if (!Cliente || valorTotal === "R$ 0.00" || Produto.length === 0 || Quantidade.length === 0
-                        || Produto[0] === "" || Quantidade[0] === "") {
+                        || Produto[1] === "" || Quantidade[1] === 0) {
                         alert("Por favor, preencha todos os campos.");
                         return; // Impede a continuação da execução da função se houver campos vazios.
                     }
@@ -871,10 +878,10 @@
             for (var i = 0; i < dateList.length; i++) {
                 var ProdutosList = "";
                 ProdutosList += `
-                    <div class="col-md-3" style="margin:2%;">
+                    <div class="col-5" style="margin:1%;">
                         <div class="card" style="display:flex; justify-content:center; align-items: center; padding:1%;">`
                 if (dateList[i]["Foto"]) {
-                    ProdutosList += `<img src="${dateList[i]["Foto"]}" class="card-img-top" style="width:280px; height: auto;">`
+                    ProdutosList += `<img src="${dateList[i]["Foto"]}" class="card-img-top">`
                 }
                 ProdutosList += `<div class="card-body">`
                 if (dateList[i]["Produto"]) {
@@ -904,12 +911,9 @@
             if (item.Origem == "request") {
                 document.getElementById('index_request').value = index;
                 document.getElementById('Cliente').value = item.Cliente;
-                document.getElementById("Produto_example_select0").value = item.Produto[0];
-                document.getElementById('Quantidade_Produto0').value = item.Quantidade[0];
-                exibirValor(0);
-                for (let i = 1; i < item.Produto.length; i++) {
-                    addProduto(item.Produto[i], item.Quantidade[i], i);
-                    exibirValor(i);
+                for (let i = 0; i < item.Produto.length; i++) {
+                    addProduto(item.Produto[i], item.Quantidade[i], i + 1, i > 0 ? false: true);
+                    exibirValor(i + 1);
                 }
                 for (let i = 0; i < item.Observação.length; i++) {
                     if (i > 0) {
@@ -917,7 +921,7 @@
                     }
                     document.getElementById('Observação').value += item.Observação[i];
                 }
-                openModal('pedidos');
+                openModal('pedidos', true);
             } else if (item.Origem == "client") {
                 document.getElementById('index_client').value = index;
                 document.getElementById('Nome').value = item.Nome;
@@ -958,7 +962,7 @@
         }
 
 
-        function sendJsonToBack(jsonData) {
+        function sendJsonToBack(jsonData, refresh) {
             // Enviar o objeto JSON em uma solicitação POST
             fetch("./", {
                 method: "POST",
@@ -970,28 +974,40 @@
                 .catch(error => {
                     console.error("Erro:", error);
                 });
-
-            window.location.reload();
+            if (!refresh) {
+                window.location.reload();
+            }
         }
 
-        function addProduto(ProdutoValue, quantityValue, index) {
+        function addProduto(ProdutoValue, quantityValue, index, btnExclusion) {
             const ProdutoExample = document.getElementById("Produto_example");
             const newProdutos = ProdutoExample.cloneNode(true);
             const ProdutosList = document.getElementById("Produto");
-
-            // Adicionando botão de exclusão
             const deleteButton = document.createElement("button");
-            deleteButton.textContent = "Excluir";
-            deleteButton.style.width = "100%";
-            deleteButton.style.maxHeight = "40px";
-            deleteButton.className = "btn btn-outline-secondary";
-            deleteButton.addEventListener("click", function () {
-                ProdutosList.removeChild(newProdutos);
-                checkAndHideDeleteButton();
-                contadorDeItens--;
-                atualizarValorTotal();
-            });
+            if (!btnExclusion) {
+                // Adicionando botão de exclusão
+                deleteButton.textContent = "Excluir";
+                deleteButton.style.width = "100%";
+                deleteButton.style.maxHeight = "40px";
+                deleteButton.className = "btn btn-outline-secondary";
+                deleteButton.onclick = function () {
+                    var startIndex = document.getElementById('index_request').value
+                    var produto = newProdutos.querySelector("#Produto_example_select" + index).value;
+                    var quantidade = newProdutos.querySelector("#Quantidade_Produto" + index).value;
+                    if (startIndex != "") {
+                        jsonData = {
+                            type: "returnProject",
+                            produto: produto,
+                            quantidade: quantidade
+                        }
 
+                        sendJsonToBack(jsonData, true);
+                    }
+                    ProdutosList.removeChild(newProdutos);
+                    contadorDeItens--;
+                    atualizarValorTotal();
+                };
+            }
             const selectElement = newProdutos.querySelector("#Produto_example_select0");
             const quantityInput = newProdutos.querySelector("#Quantidade_Produto0");
             const valorLabel = newProdutos.querySelector("#Valor0");
@@ -1023,13 +1039,10 @@
             if (existingClones < optionCount - 1) {
                 // Adicionando o botão de exclusão no final da linha
                 var newExcluir = newProdutos.querySelector("#ExcluirAqui");
-                var oldExcluir = document.querySelector("#ExcluirAqui");
-                var ExcluirCol = document.getElementById("ExcluirCol");
                 newExcluir.style.display = "block";
-                ExcluirCol.style.display = "block";
-                oldExcluir.style.display = "block";
-                newExcluir.appendChild(deleteButton);
-
+                if (!btnExclusion) {
+                    newExcluir.appendChild(deleteButton);
+                }
                 newProdutos.classList.add('produto-clone'); // Adiciona uma classe para identificar clones
                 ProdutosList.appendChild(newProdutos);
                 contadorDeItens++;
@@ -1040,19 +1053,6 @@
             }
         }
 
-
-
-        function checkAndHideDeleteButton() {
-            const ProdutosList = document.getElementById("Produto");
-            var deleteButtons = ProdutosList.querySelectorAll("#ExcluirAqui button");
-
-            if (deleteButtons.length == 0) {
-                var oldExcluir = document.querySelector("#ExcluirAqui");  // Use uma classe
-                var newExcluirCol = document.getElementById("ExcluirCol");
-                newExcluirCol.style.display = "none";
-                oldExcluir.style.display = "none";
-            }
-        }
 
         function exibirAtendimento(cliente) {
             var atendimento;
@@ -1106,7 +1106,7 @@
             var numberOfProdutos = contadorDeItens - 1;
 
             for (var i = 0; i <= numberOfProdutos; i++) {
-                var labelElement = document.getElementById("Valor" + i);
+                var labelElement = document.getElementById("Valor" + i++);
                 var valorStr = labelElement.innerHTML.replace("R$ ", ""); // Remove o "R$ " do início
                 valorTotal += parseFloat(valorStr);
             }

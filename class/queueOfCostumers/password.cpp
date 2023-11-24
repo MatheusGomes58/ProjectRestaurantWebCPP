@@ -63,3 +63,32 @@ void mostrarFila(const Fila &f)
     }
     std::cout << "\n\n";
 }
+
+void salvarSenhaChamada(const std::string &senha)
+{
+    std::fstream databaseOfPassword("./database/senhaChamada.csv", std::ios::in | std::ios::out);
+    if (databaseOfPassword.is_open())
+    {
+        databaseOfPassword.clear();
+        databaseOfPassword << senha;
+        databaseOfPassword.close();
+    }
+    else
+    {
+        std::cerr << "Erro ao abrir o arquivo para salvar a senha chamada.\n";
+    }
+}
+
+void lerSenhaChamada()
+{
+    std::fstream databaseOfPassword("./database/senhaChamada.csv");
+    if (databaseOfPassword.is_open())
+    {
+        std::getline(databaseOfPassword, senhaChamada);
+        databaseOfPassword.close();
+    }
+    else
+    {
+        std::cerr << "Erro ao abrir o arquivo para ler a senha chamada.\n";
+    }
+}
