@@ -42,6 +42,9 @@ void loadHtmlFileIntoString(const std::string &filename, std::string &targetStri
         {
             targetString.append("<script>disableRequest()</script>");
         }
+        if(alert.length() > 0){
+            std::cout << alert << std::endl;
+        }
     }
     else
     {
