@@ -382,7 +382,7 @@ void saveRequest(json jsonResponse)
     newRequest.Data = dataBuffer;
 
     char timeBuffer[10];
-    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
+    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", localTime);
     newRequest.Hora = timeBuffer;
 
     newRequest.Senha = std::to_string(programSenha + 1);
@@ -410,13 +410,47 @@ void saveRequest(json jsonResponse)
         }
     }
     addRequest(newRequest);
-    addHistory(newRequest);
+    addHistory(newRequest, "Inserido");
     return;
 }
 
 void deleteRequest(json jsonResponse)
 {
     request deleteRequest = requestMap(jsonResponse, "");
+    request delRequestValue = deleteRequest;
+
+    for (int i = 0; i < delRequestValue.Produto.size(); i++)
+    {
+        product produto = searchProducts(delRequestValue.Produto[i]);
+
+        // Convert string to numerical values
+        int newRequestQuantity = -(std::stoi(delRequestValue.Quantidade[i]));
+        int produtoQuantity = std::stoi(produto.Quantidade);
+
+        if (newRequestQuantity > 0)
+        {
+            alert = "não foi possivel deletar o produto, pois a quantidade informada é maior que a quantidade disponível!";
+            return;
+        }
+        else
+        {
+            product produtoNovo = produto;
+            produtoNovo.Quantidade = std::to_string(produtoQuantity - newRequestQuantity);
+            editProduct(produto, produtoNovo);
+        }
+    }
+
+    time_t now = time(0);
+    tm *localTime = localtime(&now);
+    char dataBuffer[11];
+    strftime(dataBuffer, sizeof(dataBuffer), "%d/%m/%Y", localTime);
+    delRequestValue.Data = dataBuffer;
+
+    char timeBuffer[10];
+    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", localTime);
+    delRequestValue.Hora = timeBuffer;
+
+    addHistory(delRequestValue, "Deletado");
     dellRequest(deleteRequest);
     return;
 }
@@ -433,11 +467,34 @@ void updateRequest(json jsonResponse)
     UpdateRequest.Data = dataBuffer;
 
     char timeBuffer[10];
-    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", localTime);
+    strftime(timeBuffer, sizeof(timeBuffer), "%H:%M:%S", localTime);
     UpdateRequest.Hora = timeBuffer;
 
+    UpdateRequest.Senha = oldRequest.Senha;
+
+    for (int i = 0; i < UpdateRequest.Produto.size(); i++)
+    {
+        product produto = searchProducts(UpdateRequest.Produto[i]);
+
+        // Convert string to numerical values
+        int newRequestQuantity = (std::stoi(UpdateRequest.Quantidade[i]) - std::stoi(oldRequest.Quantidade[i]));
+        int produtoQuantity = std::stoi(produto.Quantidade);
+
+        if (newRequestQuantity > produtoQuantity)
+        {
+            alert = "não foi possivel editar o produto, pois a quantidade informada é maior que a quantidade disponível!";
+            return;
+        }
+        else
+        {
+            product produtoNovo = produto;
+            produtoNovo.Quantidade = std::to_string(produtoQuantity - newRequestQuantity);
+            editProduct(produto, produtoNovo);
+        }
+    }
+
     editRequest(oldRequest, UpdateRequest);
-    addHistory(UpdateRequest);
+    addHistory(UpdateRequest, "Cancelado");
     return;
 }
 

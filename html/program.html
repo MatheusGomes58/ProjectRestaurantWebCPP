@@ -303,8 +303,8 @@
                                 </select>
                             </div>
                             <div class="col">
-                                <input type="number" class="form-control col-6" id="Quantidade_Produto0"
-                                    name="Quantidade" onchange="exibirValor(0)" required>
+                                <input type="text" class="form-control col-6" id="Quantidade_Produto0" name="Quantidade"
+                                    oninput="this.value = this.value.replace(/[^1-9]/g, ''); exibirValor(0)" required>
                             </div>
                             <div class="col-1" id="ExcluirAqui" style="display: none;"></div>
                             <label id="Valor0" class="col-1" style="display: flex; justify-content: end;">R$
@@ -421,7 +421,8 @@
             <div class="card-body">
                 <div class="form-group" style="margin-top: 1%;" hidden>
                     <label for="index_client">Index:</label>
-                    <input type="number" class="form-control" id="index_client" name="index_client" required>
+                    <input type="text" class="form-control" id="index_client" name="Quantidade"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
@@ -436,7 +437,8 @@
 
                 <div class="form-group" style="margin-top: 1%;">
                     <label for="Numero">Numero do Cliente:</label>
-                    <input type="number" class="form-control" id="Numero" name="Numero" required>
+                    <input type="text" class="form-control" id="Numero" name="Numero"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                 </div>
 
                 <div class="form-group" style="margin-top: 1%;">
@@ -520,7 +522,8 @@
                 <div class="col">
                     <div class="form-group" style="margin-top: 1%;" hidden>
                         <label for="index_Produto">Index:</label>
-                        <input type="number" class="form-control" id="index_Produto" name="index_Produto" required>
+                        <input type="text" class="form-control" id="index_Produto" name="index_Produto"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                     </div>
 
                     <div class="form-group" style="margin-top: 1%;">
@@ -549,17 +552,20 @@
 
                     <div class="form-group" style="margin-top: 1%;">
                         <label for="Preço">Preço do Produto (R$):</label>
-                        <input type="number" class="form-control" id="Preço" name="Preço" step="0.2" required>
+                        <input type="text" class="form-control" id="Preço" name="Preço"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '');" required>
                     </div>
 
                     <div class="form-group" style="margin-top: 1%;">
                         <label for="Tempo">Tempo Médio de Preparo (minutos):</label>
-                        <input type="number" class="form-control" id="Tempo" name="Tempo" required>
+                        <input type="text" class="form-control" id="Tempo" name="Tempo"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                     </div>
 
                     <div class="form-group" style="margin-top: 1%;">
                         <label for="Quantidade">Quantidade:</label>
-                        <input type="number" class="form-control" id="QuantidadeProduto" name="Quantidade" required>
+                        <input type="text" class="form-control" id="QuantidadeProduto" name="Quantidade"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, ''); " required>
                     </div>
 
                     <div
@@ -793,7 +799,7 @@
         function columnOrderby(dateList, passwordList, searchList) {
             if (dateList) {
                 if (dateList[0].Origem == "history") {
-                    return ['Data', 'Hora', 'Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço', 'Atendimento'];
+                    return ['Data', 'Hora', 'Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço', 'Atendimento', 'Ação'];
                 } if (dateList[0].Origem == 'request') {
                     return ['Senha', 'Cliente', 'Produto', 'Quantidade', 'Observação', 'Preço', 'Atendimento'];
                 } if (dateList[0].Origem == 'client') {

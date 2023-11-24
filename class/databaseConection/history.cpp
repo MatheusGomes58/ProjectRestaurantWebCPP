@@ -1,5 +1,5 @@
 // Função para adicionar uma entrada histórica ao arquivo CSV
-void addHistory(const request &history)
+void addHistory(const request &history, std::string action)
 {
     std::fstream databaseOfHistorys("./database/historys.csv", std::ios::app | std::ios::in | std::ios::out);
 
@@ -19,7 +19,8 @@ void addHistory(const request &history)
                            << history.Hora << "|"
                            << history.Preco << "|"
                            << history.Senha << "|"
-                           << history.Atendimento << "\n";
+                           << history.Atendimento << "|"
+                           << action << "\n";
 
         databaseOfHistorys.close();
     }
@@ -44,7 +45,7 @@ void listHistorys(std::string &searchValueData)
         {
             std::istringstream iss(line);
             request history;
-            std::string Produto, Quantidade, Observação;
+            std::string Produto, Quantidade, Observação, action;
 
             // Extrair informações da linha CSV e preencher a estrutura 'history'
             if (std::getline(iss, history.Cliente, '|') &&
@@ -55,7 +56,8 @@ void listHistorys(std::string &searchValueData)
                 std::getline(iss, history.Hora, '|') &&
                 std::getline(iss, history.Preco, '|') &&
                 std::getline(iss, history.Senha, '|') &&
-                std::getline(iss, history.Atendimento, '\n'))
+                std::getline(iss, history.Atendimento, '|') &&
+                std::getline(iss, action, '\n'))
             {
                 // Criar um objeto JSON para representar a entrada histórica
                 json historyJson;
@@ -71,6 +73,7 @@ void listHistorys(std::string &searchValueData)
                 historyJson["Preço"] = history.Preco;
                 historyJson["Senha"] = history.Senha;
                 historyJson["Atendimento"] = history.Atendimento;
+                historyJson["Ação"] = action;
                 historyJson["Origem"] = "history";
 
                 // Verifique se a string 'history.Senha' é válida antes de converter para int
@@ -81,12 +84,6 @@ void listHistorys(std::string &searchValueData)
                     {
                         programSenha = senhaAtualValue;
                     }
-                }
-
-                // Verificar se a senha encontrada é igual ao valor de pesquisa
-                if (history.Senha == searchValueData)
-                {
-                    senhaEncontrada = historyJson.dump();
                 }
 
                 // Verificar se a entrada atende aos critérios de pesquisa e adicionar à lista
@@ -108,13 +105,6 @@ void listHistorys(std::string &searchValueData)
                 }
             }
         }
-
-        // Se uma senha específica foi encontrada, a lista é atualizada apenas com essa entrada
-        if (senhaEncontrada != "")
-        {
-            listofHistorys = senhaEncontrada;
-        }
-
         databaseOfHistorys.close();
     }
     return;
