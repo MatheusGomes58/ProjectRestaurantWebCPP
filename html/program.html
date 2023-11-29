@@ -1105,8 +1105,8 @@
             var valorTotal = 0.00;
             var numberOfProdutos = contadorDeItens - 1;
 
-            for (var i = 0; i <= numberOfProdutos; i++) {
-                var labelElement = document.getElementById("Valor" + i++);
+            for (var i = 0; i < numberOfProdutos; i++) {
+                var labelElement = document.getElementById("Valor" + (i+1));
                 var valorStr = labelElement.innerHTML.replace("R$ ", ""); // Remove o "R$ " do início
                 valorTotal += parseFloat(valorStr);
             }

@@ -478,12 +478,33 @@ void updateRequest(json jsonResponse)
 
     UpdateRequest.Senha = oldRequest.Senha;
 
+    for (int i = 0; i < oldRequest.Produto.size(); i++)
+    {
+        product produto = searchProducts(oldRequest.Produto[i]);
+
+        // Convert string to numerical values
+        int newRequestQuantity = (std::stoi(oldRequest.Quantidade[i]));
+        int produtoQuantity = std::stoi(produto.Quantidade);
+
+        if (newRequestQuantity > produtoQuantity)
+        {
+            alert = "não foi possivel editar o produto, pois a quantidade informada é maior que a quantidade disponível!";
+            return;
+        }
+        else
+        {
+            product produtoNovo = produto;
+            produtoNovo.Quantidade = std::to_string(produtoQuantity + newRequestQuantity);
+            editProduct(produto, produtoNovo);
+        }
+    }
+
     for (int i = 0; i < UpdateRequest.Produto.size(); i++)
     {
         product produto = searchProducts(UpdateRequest.Produto[i]);
 
         // Convert string to numerical values
-        int newRequestQuantity = (std::stoi(UpdateRequest.Quantidade[i]) - std::stoi(oldRequest.Quantidade[i]));
+        int newRequestQuantity = (std::stoi(UpdateRequest.Quantidade[i]));
         int produtoQuantity = std::stoi(produto.Quantidade);
 
         if (newRequestQuantity > produtoQuantity)
@@ -500,7 +521,7 @@ void updateRequest(json jsonResponse)
     }
 
     editRequest(oldRequest, UpdateRequest);
-    addHistory(UpdateRequest, "Cancelado");
+    addHistory(UpdateRequest, "Atualizado");
     alert = "Sucesso ao atualizar dados do pedido!";
     return;
 }
